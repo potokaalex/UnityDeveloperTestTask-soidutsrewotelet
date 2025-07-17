@@ -1,4 +1,4 @@
-﻿namespace Game.Code.Gameplay.Unit
+﻿namespace Game.Code.Gameplay
 {
     public enum TeamType
     {
