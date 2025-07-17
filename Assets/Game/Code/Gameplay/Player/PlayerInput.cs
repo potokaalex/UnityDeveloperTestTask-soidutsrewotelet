@@ -49,7 +49,7 @@ namespace Game.Code.Gameplay.Player
             _lastClickTime = Time.time;
             _lastClickPosition = Input.mousePosition;
             var doubleClickThreshold = 0.3f;
-            return timeSinceLastClick <= doubleClickThreshold && mousePositionDelta < 0.01f;
+            return timeSinceLastClick <= doubleClickThreshold && mousePositionDelta < 0.05f;
         }
 
         private bool TryGetHit(out RaycastHit hit)

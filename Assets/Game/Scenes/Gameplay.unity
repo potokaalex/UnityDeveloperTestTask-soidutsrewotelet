@@ -2170,6 +2170,7 @@ MonoBehaviour:
   CameraController: {fileID: 963194229}
   UnitRangeView: {fileID: 863502178}
   UnitPathView: {fileID: 1900188751}
+  NavMeshSurface: {fileID: 1873332390}
 --- !u!1001 &631671409
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6979,9 +6980,9 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.083333336
+  m_VoxelSize: 0.033333335
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 8581647fd4331de47ab9a8e048e62ffc, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 59284b54c20a7bd4281ea571a890950d, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1001 &1888613938
 PrefabInstance:

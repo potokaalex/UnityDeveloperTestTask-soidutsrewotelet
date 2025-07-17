@@ -1,5 +1,6 @@
 ﻿using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit;
+using Unity.AI.Navigation;
 using Zenject;
 
 namespace Game.Code.Gameplay
