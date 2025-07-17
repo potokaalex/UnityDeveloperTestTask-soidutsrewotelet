@@ -9,6 +9,8 @@ namespace Game.Code.Gameplay.Player
     {
         private readonly CameraController _cameraController;
         private readonly UnitsSelector _unitsSelector;
+        private float _lastClickTime;
+        private Vector3 _lastClickPosition;
 
         public PlayerInput(CameraController cameraController, UnitsSelector unitsSelector)
         {
@@ -23,14 +25,31 @@ namespace Game.Code.Gameplay.Player
 
             if (Input.GetMouseButtonDown(0))
             {
+                if (_unitsSelector.HasSelected && _unitsSelector.Selected.DestinationSet)
+                    _unitsSelector.Selected.ClearDestination();
+
                 if (TryGetHit(out var hit) && hit.transform.TryGetComponent<IPlayerInteractive>(out var interactive))
                     interactive.Interact();
             }
             else if (Input.GetMouseButtonDown(1))
             {
-                if (TryGetHit(out var hit)) 
+                if (TryGetHit(out var hit) && _unitsSelector.HasSelected)
+                {
                     _unitsSelector.Selected.SetDestination(hit.point);
+                    if (IsDoubleClick())
+                        _unitsSelector.Selected.MoveDestination();
+                }
             }
+        }
+
+        private bool IsDoubleClick()
+        {
+            var timeSinceLastClick = Time.time - _lastClickTime;
+            var mousePositionDelta = Vector3.Distance(_lastClickPosition, Input.mousePosition);
+            _lastClickTime = Time.time;
+            _lastClickPosition = Input.mousePosition;
+            var doubleClickThreshold = 0.3f;
+            return timeSinceLastClick <= doubleClickThreshold && mousePositionDelta < 0.01f;
         }
 
         private bool TryGetHit(out RaycastHit hit)

@@ -4,11 +4,22 @@
     {
         public UnitController Selected { get; private set; }
 
-        public void Select(UnitController controller)
+        public bool HasSelected => Selected;
+
+        public void Select(UnitController unit)
         {
             Selected?.OnUnSelect();
-            Selected = controller;
+            Selected = unit;
             Selected.OnSelect();
+        }
+
+        public void UnSelect(UnitController unit)
+        {
+            if (Selected == unit)
+            {
+                unit.OnUnSelect();
+                Selected = null;
+            }
         }
     }
 }

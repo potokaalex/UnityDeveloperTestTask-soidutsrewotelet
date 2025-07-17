@@ -16,7 +16,7 @@ namespace Game.Code.Gameplay.Unit
         {
             MeshGenerator.GenerateCircleMesh(meshFilter.mesh, radius, radius - CircleThickness);
             position.y += 0.01f;
-            transform.position = position;
+            meshFilter.transform.position = position;
         }
 
         public void ClearMove() => MoveMeshFilter.mesh.Clear();

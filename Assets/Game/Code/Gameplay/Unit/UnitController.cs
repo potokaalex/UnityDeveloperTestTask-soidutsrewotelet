@@ -13,9 +13,12 @@ namespace Game.Code.Gameplay.Unit
         public int Type;
         public float MoveRange;
         public float AttackRange;
+        private NavMeshPath _path;
         private UnitsSelector _selector;
         private UnitRangeView _rangeView;
         private UnitPathView _pathView;
+
+        public bool DestinationSet { get; private set; }
 
         [Inject]
         public void Construct(UnitsSelector selector, UnitRangeView unitRangeView, UnitPathView unitPathView)
@@ -44,15 +47,44 @@ namespace Game.Code.Gameplay.Unit
             _rangeView.ClearMove();
             _rangeView.ClearAttack();
             _pathView.Clear();
+            DestinationSet = false;
         }
 
         public void SetDestination(Vector3 point)
         {
-            var path = new NavMeshPath();
-            NavMeshAgent.CalculatePath(point, path);
-            _pathView.View(path);
-            _rangeView.ViewAttack(AttackRange, point);
-            _rangeView.ClearMove();
+            if (TryGetPath(point))
+            {
+                DestinationSet = true;
+                _pathView.View(_path);
+                _rangeView.ViewAttack(AttackRange, point);
+            }
+            else
+                DestinationSet = false;
+        }
+
+        public void ClearDestination()
+        {
+            DestinationSet = false;
+            _pathView.Clear();
+            _rangeView.ViewAttack(AttackRange, transform.position);
+        }
+
+        public void MoveDestination()
+        {
+            if (DestinationSet)
+            {
+                NavMeshAgent.SetPath(_path);
+                _selector.UnSelect(this);
+            }
+        }
+
+        private bool TryGetPath(Vector3 toPoint)
+        {
+            _path ??= new();
+
+            if (Vector3.Distance(transform.position, toPoint) > MoveRange)
+                return false;
+            return NavMeshAgent.CalculatePath(toPoint, _path);
         }
     }
 }
