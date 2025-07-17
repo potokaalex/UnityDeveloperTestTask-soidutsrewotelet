@@ -7,13 +7,20 @@ namespace Game.Code.Gameplay
     public class GameplayInstaller : MonoInstaller
     {
         public CameraController CameraController;
-
+        public UnitRangeView UnitRangeView;
+        
         public override void InstallBindings()
+        {
+            BindUnit();
+            Container.Bind<CameraController>().FromInstance(CameraController).AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerRaycaster>().AsSingle();
+        }
+
+        private void BindUnit()
         {
             Container.Bind<UnitsContainer>().AsSingle();
             Container.Bind<UnitsSelector>().AsSingle();
-            Container.Bind<CameraController>().FromInstance(CameraController).AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerRaycaster>().AsSingle();
+            Container.Bind<UnitRangeView>().FromInstance(UnitRangeView).AsSingle();
         }
     }
 }

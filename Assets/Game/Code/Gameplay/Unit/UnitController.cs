@@ -8,13 +8,18 @@ namespace Game.Code.Gameplay.Unit
     public class UnitController : NetworkBehaviour, IPlayerInteractive
     {
         public int Type;
-        public float MoveDistance;
+        public float MoveRange;
         public float AttackRange;
         public GameObject SelectionIndicator;
         private UnitsSelector _selector;
-        
+        private UnitRangeView _rangeView;
+
         [Inject]
-        public void Construct(UnitsSelector selector) => _selector = selector;
+        public void Construct(UnitsSelector selector, UnitRangeView unitRangeView)
+        {
+            _rangeView = unitRangeView;
+            _selector = selector;
+        }
 
         public void Interact()
         {
@@ -22,7 +27,11 @@ namespace Game.Code.Gameplay.Unit
                 _selector.Select(this);
         }
 
-        public void OnSelect() => SelectionIndicator.SetActive(true);
+        public void OnSelect()
+        {
+            SelectionIndicator.SetActive(true);
+            _rangeView.View(MoveRange, transform.position);
+        }
 
         public void OnUnSelect() => SelectionIndicator.SetActive(false);
     }
