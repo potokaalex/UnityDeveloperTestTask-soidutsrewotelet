@@ -15,5 +15,12 @@ namespace Game.Code.Gameplay.Unit
                 if (unit.Value == team)
                     outList.Add(unit.Key);
         }
+
+        public void Get(List<UnitController> outList)
+        {
+            outList.Clear();
+            foreach (var unit in _units)
+                outList.Add(unit.Key);
+        }
     }
 }

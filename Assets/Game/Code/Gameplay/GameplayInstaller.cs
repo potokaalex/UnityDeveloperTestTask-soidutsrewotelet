@@ -1,6 +1,5 @@
 ﻿using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit;
-using Unity.AI.Navigation;
 using Zenject;
 
 namespace Game.Code.Gameplay
@@ -24,6 +23,7 @@ namespace Game.Code.Gameplay
             Container.Bind<UnitsSelector>().AsSingle();
             Container.Bind<UnitRangeView>().FromInstance(UnitRangeView).AsSingle();
             Container.Bind<UnitPathView>().FromInstance(UnitPathView).AsSingle();
+            Container.Bind<UnitAttackController>().AsSingle();
         }
     }
 }

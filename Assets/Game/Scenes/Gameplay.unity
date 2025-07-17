@@ -2170,7 +2170,6 @@ MonoBehaviour:
   CameraController: {fileID: 963194229}
   UnitRangeView: {fileID: 863502178}
   UnitPathView: {fileID: 1900188751}
-  NavMeshSurface: {fileID: 1873332390}
 --- !u!1001 &631671409
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3371,7 +3370,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 863502174}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eedd4e39af849da97bf81ddc68e614b, type: 3}
+  m_Script: {fileID: 11500000, guid: e4e9f13283f77cd49bf87857b9f9fb82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MoveMeshFilter: {fileID: 1470748164}

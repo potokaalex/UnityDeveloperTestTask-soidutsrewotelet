@@ -10,39 +10,45 @@ namespace Game.Code.Gameplay.Unit
     {
         public GameObject SelectionIndicator;
         public NavMeshObstacle NavMeshObstacle;
+        public GameObject CanBeAttackedIndicator;
         public int Type;
         public float MoveRange;
         public float AttackRange;
         public float PositionVelocity;
+        public float BodyRadius;
         private NavMeshPath _path;
         private UnitsSelector _selector;
         private UnitRangeView _rangeView;
         private UnitPathView _pathView;
+        private UnitAttackController _attackController;
         private bool _moving;
         private int _currentCornerIndex;
 
         public bool DestinationSet { get; private set; }
 
+        public bool IsEnemy => !IsOwner;
+
         [Inject]
-        public void Construct(UnitsSelector selector, UnitRangeView unitRangeView, UnitPathView unitPathView)
+        public void Construct(UnitsSelector selector, UnitRangeView rangeView, UnitPathView unitPathView, UnitAttackController attackController)
         {
+            _attackController = attackController;
             _pathView = unitPathView;
-            _rangeView = unitRangeView;
+            _rangeView = rangeView;
             _selector = selector;
         }
 
         public void Update()
         {
-            if (!_moving || _path.corners.Length == 0 || _currentCornerIndex >= _path.corners.Length)
+            if (!IsOwner || !_moving || _path.corners.Length == 0 || _currentCornerIndex >= _path.corners.Length)
                 return;
 
             var target = _path.corners[_currentCornerIndex];
             var direction = (target - transform.position).normalized;
 
             var offset = PositionVelocity * Time.deltaTime;
-            var distanceToTarget = Vector3.Distance(transform.position, target);
+            var distance = Vector3.Distance(transform.position, target);
 
-            if (offset >= distanceToTarget)
+            if (offset >= distance)
             {
                 transform.position = target;
                 _currentCornerIndex++;
@@ -67,7 +73,7 @@ namespace Game.Code.Gameplay.Unit
         {
             SelectionIndicator.SetActive(true);
             _rangeView.ViewMove(MoveRange, transform.position);
-            _rangeView.ViewAttack(AttackRange, transform.position);
+            _attackController.Set(transform.position, AttackRange);
             NavMeshObstacle.enabled = false;
         }
 
@@ -75,7 +81,7 @@ namespace Game.Code.Gameplay.Unit
         {
             SelectionIndicator.SetActive(false);
             _rangeView.ClearMove();
-            _rangeView.ClearAttack();
+            _attackController.Clear();
             _pathView.Clear();
             NavMeshObstacle.enabled = true;
         }
@@ -86,7 +92,7 @@ namespace Game.Code.Gameplay.Unit
             {
                 DestinationSet = true;
                 _pathView.View(_path);
-                _rangeView.ViewAttack(AttackRange, point);
+                _attackController.Set(point, AttackRange);
             }
             else
                 DestinationSet = false;
@@ -96,7 +102,7 @@ namespace Game.Code.Gameplay.Unit
         {
             DestinationSet = false;
             _pathView.Clear();
-            _rangeView.ViewAttack(AttackRange, transform.position);
+            _attackController.Set(transform.position, AttackRange);
         }
 
         public void MoveDestination()
@@ -107,6 +113,12 @@ namespace Game.Code.Gameplay.Unit
                 _selector.UnSelect(this);
             }
         }
+
+        public bool IsInRange(Vector3 center, float radius) => MathExtensions.IsCirclesIntersect(center, radius, transform.position, BodyRadius);
+
+        public void ShowCanBeAttacked() => CanBeAttackedIndicator.SetActive(true);
+
+        public void HideCanBeAttacked() => CanBeAttackedIndicator.SetActive(false);
 
         private bool TryGetPath(Vector3 toPoint)
         {
