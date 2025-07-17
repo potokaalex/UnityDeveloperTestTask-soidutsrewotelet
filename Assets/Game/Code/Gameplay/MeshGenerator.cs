@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Game.Code.Gameplay
 {
@@ -24,30 +25,94 @@ namespace Game.Code.Gameplay
                 vertices[i * 2 + 1] = new Vector3(cos * outerRadius, 0, sin * outerRadius);
             }
 
-            //create triangles between pairs of vertices
+            CreateTrianglesBetweenPairs(segments, triangles);
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+        }
+
+
+        public static void GenerateStripMesh(Mesh mesh, List<Vector3> points, float width)
+        {
+            mesh.Clear();
+
+            if (points.Count < 2)
+                return;
+
+            var count = points.Count;
+            var vertices = new Vector3[count * 2];
+            var triangles = new int[(count - 1) * 6];
+
+            for (var i = 0; i < count; i++)
+            {
+                Vector3 forward;
+
+                //calculating the direction of the segment:
+                if (i == 0)
+                {
+                    //for the first point, we are looking at the direction to the next one
+                    forward = (points[i + 1] - points[i]).normalized;
+                }
+                else if (i == count - 1)
+                {
+                    //for the last point — from the previous one
+                    forward = (points[i] - points[i - 1]).normalized;
+                }
+                else
+                {
+                    //for intermediate ones, we average the directions before and after
+                    var dir1 = (points[i] - points[i - 1]).normalized;
+                    var dir2 = (points[i + 1] - points[i]).normalized;
+                    forward = ((dir1 + dir2) * 0.5f).normalized;
+                }
+
+                //get a vector perpendicular to the direction of motion in the XZ plane
+                var side = Vector3.Cross(forward, Vector3.up).normalized * (width * 0.5f);
+
+                //adding 2 vertices: the left and the right relative to the current point
+                vertices[i * 2] = points[i] - side;
+                vertices[i * 2 + 1] = points[i] + side;
+            }
+
+            CreateTrianglesBetweenPairs(count - 1, triangles, false);
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+        }
+
+        private static void CreateTrianglesBetweenPairs(int count, int[] triangles, bool flip = true)
+        {
             var tri = 0;
-            for (var i = 0; i < segments; i++)
+            for (var i = 0; i < count; i++)
             {
                 var i0 = i * 2;
                 var i1 = i * 2 + 1;
                 var i2 = i * 2 + 2;
                 var i3 = i * 2 + 3;
 
-                //first triangle
-                triangles[tri++] = i0;
-                triangles[tri++] = i3;
-                triangles[tri++] = i1;
+                if (flip) //normals down
+                {
+                    triangles[tri++] = i0;
+                    triangles[tri++] = i3;
+                    triangles[tri++] = i1;
 
-                //second triangle
-                triangles[tri++] = i0;
-                triangles[tri++] = i2;
-                triangles[tri++] = i3;
+                    triangles[tri++] = i0;
+                    triangles[tri++] = i2;
+                    triangles[tri++] = i3;
+                }
+                else
+                {
+                    triangles[tri++] = i0;
+                    triangles[tri++] = i1;
+                    triangles[tri++] = i3;
+
+                    triangles[tri++] = i0;
+                    triangles[tri++] = i3;
+                    triangles[tri++] = i2;
+                }
             }
-
-            mesh.vertices = vertices;
-            mesh.triangles = triangles;
-            mesh.RecalculateNormals();
-            mesh.RecalculateBounds();
         }
     }
 }

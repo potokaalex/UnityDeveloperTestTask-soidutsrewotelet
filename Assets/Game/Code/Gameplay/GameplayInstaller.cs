@@ -8,12 +8,13 @@ namespace Game.Code.Gameplay
     {
         public CameraController CameraController;
         public UnitRangeView UnitRangeView;
+        public UnitPathView UnitPathView;
         
         public override void InstallBindings()
         {
             BindUnit();
             Container.Bind<CameraController>().FromInstance(CameraController).AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerRaycaster>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerInput>().AsSingle();
         }
 
         private void BindUnit()
@@ -21,6 +22,7 @@ namespace Game.Code.Gameplay
             Container.Bind<UnitsContainer>().AsSingle();
             Container.Bind<UnitsSelector>().AsSingle();
             Container.Bind<UnitRangeView>().FromInstance(UnitRangeView).AsSingle();
+            Container.Bind<UnitPathView>().FromInstance(UnitPathView).AsSingle();
         }
     }
 }

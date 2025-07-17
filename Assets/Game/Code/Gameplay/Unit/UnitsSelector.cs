@@ -2,13 +2,13 @@
 {
     public class UnitsSelector
     {
-        private UnitController _selected;
+        public UnitController Selected { get; private set; }
 
         public void Select(UnitController controller)
         {
-            _selected?.OnUnSelect();
-            _selected = controller;
-            _selected.OnSelect();
+            Selected?.OnUnSelect();
+            Selected = controller;
+            Selected.OnSelect();
         }
     }
 }
