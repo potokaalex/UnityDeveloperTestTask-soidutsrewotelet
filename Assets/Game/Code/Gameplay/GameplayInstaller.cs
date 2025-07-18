@@ -1,4 +1,5 @@
-﻿using Game.Code.Gameplay.Player;
+﻿using Game.Code.Gameplay.Hud;
+using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit;
 using Game.Code.Gameplay.Unit.View;
 using Zenject;
@@ -10,14 +11,17 @@ namespace Game.Code.Gameplay
         public CameraController CameraController;
         public UnitRangeView UnitRangeView;
         public UnitPathView UnitPathView;
-        public PlayerController PlayerController;
-        
+        public MatchController MatchController;
+        public HudWindow HudWindow;
+
         public override void InstallBindings()
         {
             BindUnit();
             Container.Bind<CameraController>().FromInstance(CameraController).AsSingle();
             Container.BindInterfacesAndSelfTo<PlayerInput>().AsSingle();
-            Container.Bind<PlayerController>().FromInstance(PlayerController).AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayersContainer>().AsSingle();
+            Container.Bind<MatchController>().FromInstance(MatchController).AsSingle();
+            Container.Bind<HudWindow>().FromInstance(HudWindow).AsSingle();
         }
 
         private void BindUnit()

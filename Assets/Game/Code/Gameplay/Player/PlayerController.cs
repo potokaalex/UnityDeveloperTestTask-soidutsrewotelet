@@ -1,36 +1,27 @@
 ﻿using Unity.Netcode;
+using Zenject;
 
 namespace Game.Code.Gameplay.Player
 {
     public class PlayerController : NetworkBehaviour
     {
-        public TeamType Team { get; private set; }
+        private PlayersContainer _playersContainer;
 
-        public override void OnNetworkSpawn()
-        {
-            if (IsServer)
-                NetworkManager.OnClientConnectedCallback += OnClientConnected;
-        }
+        public NetworkVariable<int> Id { get; } = new();
 
-        public override void OnNetworkDespawn()
-        {
-            if (IsServer)
-                NetworkManager.OnClientConnectedCallback -= OnClientConnected;
-        }
+        public NetworkVariable<TeamType> Team { get; } = new();
 
-        private void OnClientConnected(ulong clientId)
-        {
-            var team = TeamType.None;
+        public NetworkVariable<int> AttackCount { get; } = new(1);
 
-            if (clientId == NetworkManager.ConnectedClientsIds[0])
-                team = TeamType.A;
-            else if (clientId == NetworkManager.ConnectedClientsIds[1])
-                team = TeamType.B;
+        public NetworkVariable<int> MoveCount { get; } = new(1);
 
-            SetDataForClientRpc(team, new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } } });
-        }
+        public bool CanAction => AttackCount.Value > 0 && MoveCount.Value > 0;
 
-        [ClientRpc]
-        private void SetDataForClientRpc(TeamType team, ClientRpcParams rpcParams = default) => Team = team;
+        [Inject]
+        public void Construct(PlayersContainer playersContainer) => _playersContainer = playersContainer;
+
+        public override void OnNetworkSpawn() => _playersContainer.Add(this);
+
+        public override void OnNetworkDespawn() => _playersContainer.Remove(this);
     }
 }

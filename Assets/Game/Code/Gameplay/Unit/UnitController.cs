@@ -20,7 +20,7 @@ namespace Game.Code.Gameplay.Unit
         public float PositionVelocity = 5;
         public UnitView View;
         public NavMeshObstacle NavMeshObstacle;
-        private PlayerController _playerController;
+        private ICurrentPlayerProvider _playerProvider;
         private UnitsSelector _selector;
         private UnitsContainer _container;
         private bool _moving;
@@ -32,16 +32,16 @@ namespace Game.Code.Gameplay.Unit
 
         public Vector3[] PathPoints { get; private set; }
 
-        public bool IsEnemy => IsEnemies(_playerController.Team, Team.Value);
+        public bool IsEnemy => IsEnemies(_playerProvider.Player.Team.Value, Team.Value);
 
         public bool IsDestinationSet => PathPoints != null && PathPoints.Length > 0;
 
         public float FullAttackRadius => AttackRadius + BodyRadius;
 
         [Inject]
-        public void Construct(PlayerController playerController, UnitsSelector selector, UnitsContainer container)
+        public void Construct(ICurrentPlayerProvider playerController, UnitsSelector selector, UnitsContainer container)
         {
-            _playerController = playerController;
+            _playerProvider = playerController;
             _selector = selector;
             _container = container;
         }
@@ -82,7 +82,7 @@ namespace Game.Code.Gameplay.Unit
 
         public void Interact()
         {
-            if (!IsEnemy)
+            if (!IsServer && !IsEnemy)
                 _selector.Select(this);
         }
 
@@ -109,7 +109,7 @@ namespace Game.Code.Gameplay.Unit
         public void Attack(UnitController unit)
         {
             if (unit != this)
-                AttackServerRpc(unit.Id.Value, _playerController.Team);
+                AttackServerRpc(unit.Id.Value, _playerProvider.Player.Team.Value);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -186,7 +186,7 @@ namespace Game.Code.Gameplay.Unit
         {
             if (_selector.Selected == this)
             {
-                using var d = GetUnitsForAttack(point, _playerController.Team, out var forAttack);
+                using var d = GetUnitsForAttack(point, _playerProvider.Player.Team.Value, out var forAttack);
                 using var d1 = GetAllEnemies(out var enemies);
                 View.ViewAttack(point, FullAttackRadius, forAttack, enemies);
             }
