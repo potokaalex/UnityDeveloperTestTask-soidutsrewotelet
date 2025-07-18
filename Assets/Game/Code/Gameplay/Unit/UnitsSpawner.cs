@@ -24,10 +24,12 @@ namespace Game.Code.Gameplay.Unit
         {
             var prefab = Prefabs.First(x => x.Type == preset.Type);
             var instance = Instantiate(prefab);
-            instance.NetworkObject.Spawn();
             instance.transform.position = spawnPoint.transform.position;
+            instance.Team.Initialize(instance);
             instance.Team.Value = spawnPoint.Team;
+            instance.Id.Initialize(instance);
             instance.Id.Value = _unitId++;
+            instance.NetworkObject.Spawn();
         }
     }
 }

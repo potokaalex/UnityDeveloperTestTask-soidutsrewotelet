@@ -323,6 +323,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SelectionIndicator: {fileID: 9105694441207156631}
   CanBeAttackedIndicator: {fileID: 6735800335440375920}
+  MeshRenderer: {fileID: 5818189974184231623}
+  MaterialsPerTeam:
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 1
+    - value: 2
+    _saintsValues:
+    - value: {fileID: 2100000, guid: bf827dbce8a745a4b8dcf2ad809485ac, type: 2}
+    - value: {fileID: 2100000, guid: c9957fd8fd0884845842180746af3789, type: 2}
 --- !u!114 &5636402167801006196
 MonoBehaviour:
   m_ObjectHideFlags: 0

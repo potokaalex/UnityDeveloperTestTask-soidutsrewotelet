@@ -35,9 +35,14 @@ namespace Game.Code.Gameplay.Player
             {
                 if (TryGetHit(out var hit) && _unitsSelector.HasSelected)
                 {
-                    _unitsSelector.Selected.SetDestination(hit.point);
-                    if (IsDoubleClick())
-                        _unitsSelector.Selected.MoveDestination();
+                    if (hit.transform.TryGetComponent<UnitController>(out var unit))
+                        _unitsSelector.Selected.Attack(unit);
+                    else
+                    {
+                        _unitsSelector.Selected.SetDestination(hit.point);
+                        if (IsDoubleClick())
+                            _unitsSelector.Selected.MoveDestination();
+                    }
                 }
             }
         }

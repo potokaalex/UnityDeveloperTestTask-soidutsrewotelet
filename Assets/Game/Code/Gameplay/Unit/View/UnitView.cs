@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SaintsField;
 using UnityEngine;
 using Zenject;
 
@@ -8,6 +9,8 @@ namespace Game.Code.Gameplay.Unit.View
     {
         public GameObject SelectionIndicator;
         public GameObject CanBeAttackedIndicator;
+        public MeshRenderer MeshRenderer;
+        public SaintsDictionary<TeamType, Material> MaterialsPerTeam;
         private UnitRangeView _rangeView;
         private UnitPathView _pathView;
 
@@ -16,6 +19,12 @@ namespace Game.Code.Gameplay.Unit.View
         {
             _pathView = pathView;
             _rangeView = rangeView;
+        }
+
+        public void Setup(TeamType team)
+        {
+            if(team != TeamType.None)
+                MeshRenderer.sharedMaterial = MaterialsPerTeam[team];
         }
 
         public void ViewSelect(Vector3 center, float speed)

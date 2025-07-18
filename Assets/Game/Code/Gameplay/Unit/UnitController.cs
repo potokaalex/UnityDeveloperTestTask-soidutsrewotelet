@@ -23,7 +23,6 @@ namespace Game.Code.Gameplay.Unit
         private PlayerController _playerController;
         private UnitsSelector _selector;
         private UnitsContainer _container;
-        private NavMeshPath _path;
         private bool _moving;
         private int _currentCornerIndex;
 
@@ -33,7 +32,7 @@ namespace Game.Code.Gameplay.Unit
 
         public Vector3[] PathPoints { get; private set; }
 
-        public bool IsEnemy => _playerController.Team != Team.Value;
+        public bool IsEnemy => IsEnemies(_playerController.Team, Team.Value);
 
         public bool IsDestinationSet => PathPoints != null && PathPoints.Length > 0;
 
@@ -47,14 +46,20 @@ namespace Game.Code.Gameplay.Unit
             _container = container;
         }
 
-        public override void OnNetworkSpawn() => _container.Add(this, Team.Value);
+        public override void OnNetworkSpawn()
+        {
+            _container.Add(this);
+            View.Setup(Team.Value);
+        }
+
+        public override void OnNetworkDespawn() => _container.Remove(this);
 
         public void Update()
         {
-            if (!IsServer || !_moving || _path.corners.Length == 0 || _currentCornerIndex >= _path.corners.Length)
+            if (!IsServer || !_moving || PathPoints.Length == 0 || _currentCornerIndex >= PathPoints.Length)
                 return;
 
-            var target = _path.corners[_currentCornerIndex];
+            var target = PathPoints[_currentCornerIndex];
             var direction = (target - transform.position).normalized;
 
             var offset = PositionVelocity * Time.deltaTime;
@@ -65,7 +70,7 @@ namespace Game.Code.Gameplay.Unit
                 transform.position = target;
                 _currentCornerIndex++;
 
-                if (_currentCornerIndex >= _path.corners.Length)
+                if (_currentCornerIndex >= PathPoints.Length)
                 {
                     _moving = false;
                     _currentCornerIndex = 0;
@@ -101,6 +106,12 @@ namespace Game.Code.Gameplay.Unit
 
         public void ClearDestination() => ClearDestinationServerRpc();
 
+        public void Attack(UnitController unit)
+        {
+            if (unit != this)
+                AttackServerRpc(unit.Id.Value, _playerController.Team);
+        }
+
         [ServerRpc(RequireOwnership = false)]
         private void OnSelectServerRpc() => NavMeshObstacle.enabled = false;
 
@@ -110,16 +121,16 @@ namespace Game.Code.Gameplay.Unit
         [ServerRpc(RequireOwnership = false)]
         private void SetDestinationServerRpc(Vector3 point, ServerRpcParams rpcParams = default)
         {
-            var path = Array.Empty<Vector3>();
+            PathPoints = Array.Empty<Vector3>();
 
             if (Vector3.Distance(transform.position, point) <= Speed)
             {
-                _path ??= new();
-                if (NavMesh.CalculatePath(transform.position, point, NavMesh.AllAreas, _path))
-                    path = _path.corners;
+                var path = new NavMeshPath();
+                if (NavMesh.CalculatePath(transform.position, point, NavMesh.AllAreas, path)) 
+                    PathPoints = path.corners;
             }
 
-            SetPathClientRpc(path,
+            SetPathClientRpc(PathPoints,
                 new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
         }
 
@@ -135,9 +146,12 @@ namespace Game.Code.Gameplay.Unit
         [ServerRpc(RequireOwnership = false)]
         private void MoveDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
-            _moving = true;
-            OnMoveDestinationClientRpc(
-                new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
+            if (IsDestinationSet)
+            {
+                _moving = true;
+                OnMoveDestinationClientRpc(
+                    new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
+            }
         }
 
         [ClientRpc]
@@ -146,7 +160,7 @@ namespace Game.Code.Gameplay.Unit
         [ServerRpc(RequireOwnership = false)]
         private void ClearDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
-            _path.ClearCorners();
+            PathPoints = Array.Empty<Vector3>();
             ClearDestinationClientRpc(new ClientRpcParams
                 { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
         }
@@ -160,28 +174,38 @@ namespace Game.Code.Gameplay.Unit
             CalculateAttack(transform.position);
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        private void AttackServerRpc(int unitId, TeamType playTeam)
+        {
+            using var d = GetUnitsForAttack(transform.position, playTeam, out var units);
+            if (units.Select(x => x.Id.Value).Contains(unitId))
+                _container.Get(unitId).NetworkObject.Despawn();
+        }
+
         private void CalculateAttack(Vector3 point, ServerRpcParams rpcParams = default)
         {
             if (_selector.Selected == this)
             {
-                using var d = GetUnitsForAttack(point, out var forAttack);
+                using var d = GetUnitsForAttack(point, _playerController.Team, out var forAttack);
                 using var d1 = GetAllEnemies(out var enemies);
                 View.ViewAttack(point, FullAttackRadius, forAttack, enemies);
             }
         }
 
-        private IDisposable GetUnitsForAttack(Vector3 point, out List<UnitController> outList)
+        private IDisposable GetUnitsForAttack(Vector3 point, TeamType playTeam, out List<UnitController> outList)
         {
             using var d = UnityEngine.Pool.ListPool<UnitController>.Get(out var units);
             _container.Get(units);
 
             var result = UnityEngine.Pool.ListPool<UnitController>.Get(out outList);
             foreach (var unit in units)
-                if (unit.IsEnemy && unit.IsInRange(point, FullAttackRadius))
+                if (IsEnemies(playTeam, unit.Team.Value) && unit.IsInRange(point, FullAttackRadius))
                     outList.Add(unit);
 
             return result;
         }
+
+        private bool IsEnemies(TeamType team1, TeamType team2) => team1 != team2;
 
         private IDisposable GetAllEnemies(out List<UnitController> outList)
         {
