@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.Pool;
 
 namespace Game.Code.Gameplay.Unit
@@ -9,10 +8,10 @@ namespace Game.Code.Gameplay.Unit
         public float Width;
         public MeshFilter MeshFilter;
 
-        public void View(NavMeshPath path)
+        public void View(Vector3[] path)
         {
             using var d = ListPool<Vector3>.Get(out var points);
-            points.AddRange(path.corners);
+            points.AddRange(path);
             MeshGenerator.GenerateStripMesh(MeshFilter.mesh, points, Width);
         }
 

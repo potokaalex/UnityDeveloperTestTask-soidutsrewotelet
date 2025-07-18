@@ -25,7 +25,7 @@ namespace Game.Code.Gameplay.Player
 
             if (Input.GetMouseButtonDown(0))
             {
-                if (_unitsSelector.HasSelected && _unitsSelector.Selected.DestinationSet)
+                if (_unitsSelector.HasSelected && _unitsSelector.Selected.IsDestinationSet)
                     _unitsSelector.Selected.ClearDestination();
 
                 if (TryGetHit(out var hit) && hit.transform.TryGetComponent<IPlayerInteractive>(out var interactive))

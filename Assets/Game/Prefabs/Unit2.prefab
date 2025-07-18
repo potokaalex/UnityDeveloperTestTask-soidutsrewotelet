@@ -48,6 +48,26 @@ PrefabInstance:
       propertyPath: m_Height
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 5051987900954021386, guid: f109a4bad4e3ca249b95a475d993b683, type: 3}
+      propertyPath: m_Center.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5051987900954021386, guid: f109a4bad4e3ca249b95a475d993b683, type: 3}
+      propertyPath: m_Extents.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5636402167801006196, guid: f109a4bad4e3ca249b95a475d993b683, type: 3}
+      propertyPath: Type
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5636402167801006196, guid: f109a4bad4e3ca249b95a475d993b683, type: 3}
+      propertyPath: Speed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5636402167801006196, guid: f109a4bad4e3ca249b95a475d993b683, type: 3}
+      propertyPath: AttackRange
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6853454031820601663, guid: f109a4bad4e3ca249b95a475d993b683, type: 3}
       propertyPath: m_Name
       value: Unit2

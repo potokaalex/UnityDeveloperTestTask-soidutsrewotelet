@@ -30,6 +30,7 @@ namespace Game.Code.Gameplay.Unit
             var instance = Instantiate(prefab);
             instance.NetworkObject.Spawn();
             instance.transform.position = spawnPoint.transform.position;
+            instance.Team.Value = spawnPoint.Team;
             _container.Add(instance, spawnPoint.Team);
         }
     }

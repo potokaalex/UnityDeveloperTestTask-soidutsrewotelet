@@ -1,4 +1,6 @@
-﻿using Game.Code.Gameplay.Player;
+﻿using System;
+using Game.Code.Gameplay.Player;
+using UniRx;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,38 +10,38 @@ namespace Game.Code.Gameplay.Unit
 {
     public class UnitController : NetworkBehaviour, IPlayerInteractive
     {
-        public GameObject SelectionIndicator;
-        public NavMeshObstacle NavMeshObstacle;
-        public GameObject CanBeAttackedIndicator;
         public int Type;
-        public float MoveRange;
-        public float AttackRange;
-        public float PositionVelocity;
-        public float BodyRadius;
-        private NavMeshPath _path;
+        public float Speed;
+        public float AttackRange; //1-5
+        public float BodyRadius = 0.125f;
+        public float PositionVelocity = 5;
+        public NavMeshObstacle NavMeshObstacle;
+        private PlayerController _playerController;
         private UnitsSelector _selector;
-        private UnitRangeView _rangeView;
-        private UnitPathView _pathView;
-        private UnitAttackController _attackController;
+        private NavMeshPath _path;
         private bool _moving;
         private int _currentCornerIndex;
 
-        public bool DestinationSet { get; private set; }
+        public bool IsEnemy => _playerController.Team != Team.Value;
 
-        public bool IsEnemy => !IsOwner;
+        public NetworkVariable<TeamType> Team { get; } = new(); //use spawn payload ?
+
+        public ReactiveProperty<Vector3[]> PathPoints { get; } = new();
+
+        public ReactiveProperty<bool> IsSelect { get; } = new();
+
+        public bool IsDestinationSet => PathPoints.Value != null && PathPoints.Value.Length > 0;
 
         [Inject]
-        public void Construct(UnitsSelector selector, UnitRangeView rangeView, UnitPathView unitPathView, UnitAttackController attackController)
+        public void Construct(PlayerController playerController, UnitsSelector selector)
         {
-            _attackController = attackController;
-            _pathView = unitPathView;
-            _rangeView = rangeView;
+            _playerController = playerController;
             _selector = selector;
         }
 
         public void Update()
         {
-            if (!IsOwner || !_moving || _path.corners.Length == 0 || _currentCornerIndex >= _path.corners.Length)
+            if (!IsServer || !_moving || _path.corners.Length == 0 || _currentCornerIndex >= _path.corners.Length)
                 return;
 
             var target = _path.corners[_currentCornerIndex];
@@ -65,68 +67,80 @@ namespace Game.Code.Gameplay.Unit
 
         public void Interact()
         {
-            if (IsOwner)
+            if (!IsEnemy)
                 _selector.Select(this);
         }
 
-        public void OnSelect()
+        public void OnSelect() => OnSelectServerRpc();
+
+        public void OnUnSelect() => OnUnSelectServerRpc();
+
+        public void SetDestination(Vector3 point) => SetDestinationServerRpc(point);
+
+        public void MoveDestination() => MoveDestinationServerRpc();
+
+        public void ClearDestination() => ClearDestinationServerRpc();
+
+        [ServerRpc(RequireOwnership = false)]
+        private void OnSelectServerRpc(ServerRpcParams rpcParams = default)
         {
-            SelectionIndicator.SetActive(true);
-            _rangeView.ViewMove(MoveRange, transform.position);
-            _attackController.Set(transform.position, AttackRange);
             NavMeshObstacle.enabled = false;
+            SetIsSelectClientRpc(true,
+                new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
         }
 
-        public void OnUnSelect()
+        [ServerRpc(RequireOwnership = false)]
+        private void OnUnSelectServerRpc(ServerRpcParams rpcParams = default)
         {
-            SelectionIndicator.SetActive(false);
-            _rangeView.ClearMove();
-            _attackController.Clear();
-            _pathView.Clear();
             NavMeshObstacle.enabled = true;
+            SetIsSelectClientRpc(false,
+                new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
         }
 
-        public void SetDestination(Vector3 point)
+        [ClientRpc]
+        private void SetIsSelectClientRpc(bool isSelect, ClientRpcParams rpcParams = default) => IsSelect.Value = isSelect;
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetDestinationServerRpc(Vector3 point, ServerRpcParams rpcParams = default)
         {
-            if (TryGetPath(point))
+            var path = Array.Empty<Vector3>();
+
+            if (Vector3.Distance(transform.position, point) <= Speed)
             {
-                DestinationSet = true;
-                _pathView.View(_path);
-                _attackController.Set(point, AttackRange);
+                _path ??= new();
+                if (NavMesh.CalculatePath(transform.position, point, NavMesh.AllAreas, _path))
+                    path = _path.corners;
             }
-            else
-                DestinationSet = false;
+
+            SetPathClientRpc(path,
+                new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
         }
 
-        public void ClearDestination()
+        [ClientRpc]
+        private void SetPathClientRpc(Vector3[] path, ClientRpcParams rpcParams = default) => PathPoints.Value = path;
+
+        [ServerRpc(RequireOwnership = false)]
+        private void MoveDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
-            DestinationSet = false;
-            _pathView.Clear();
-            _attackController.Set(transform.position, AttackRange);
+            _moving = true;
+            OnMoveDestinationClientRpc(
+                new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
         }
 
-        public void MoveDestination()
+        [ClientRpc]
+        private void OnMoveDestinationClientRpc(ClientRpcParams rpcParams = default) => _selector.UnSelect(this);
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ClearDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
-            if (DestinationSet)
-            {
-                _moving = true;
-                _selector.UnSelect(this);
-            }
+            ClearDestinationClientRpc(new ClientRpcParams
+                { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
         }
 
-        public bool IsInRange(Vector3 center, float radius) => MathExtensions.IsCirclesIntersect(center, radius, transform.position, BodyRadius);
+        [ClientRpc]
+        private void ClearDestinationClientRpc(ClientRpcParams rpcParams = default) => PathPoints.Value = Array.Empty<Vector3>();
 
-        public void ShowCanBeAttacked() => CanBeAttackedIndicator.SetActive(true);
-
-        public void HideCanBeAttacked() => CanBeAttackedIndicator.SetActive(false);
-
-        private bool TryGetPath(Vector3 toPoint)
-        {
-            _path ??= new();
-
-            if (Vector3.Distance(transform.position, toPoint) > MoveRange)
-                return false;
-            return NavMesh.CalculatePath(transform.position, toPoint, NavMesh.AllAreas, _path);
-        }
+        //public bool IsInRange(Vector3 center, float radius) =>
+        //    MathExtensions.IsCirclesIntersect(center, radius, transform.position, BodyRadius); //логика
     }
 }

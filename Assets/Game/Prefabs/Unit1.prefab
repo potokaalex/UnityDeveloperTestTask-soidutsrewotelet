@@ -178,9 +178,10 @@ GameObject:
   - component: {fileID: 369398906846660193}
   - component: {fileID: 5051987900954021386}
   - component: {fileID: 1691751686097336224}
-  - component: {fileID: 6563393524008574200}
   - component: {fileID: 4588285489902874152}
+  - component: {fileID: 3120754185335775534}
   - component: {fileID: 3992592145963563741}
+  - component: {fileID: 5636402167801006196}
   m_Layer: 0
   m_Name: Unit1
   m_TagString: Untagged
@@ -264,38 +265,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &6563393524008574200
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6853454031820601663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97616b67982a4be48d957d421e422433, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 0
-  SlerpPosition: 0
-  StaleDataHandling: 1
 --- !u!114 &4588285489902874152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,6 +278,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _containerSource: 0
+--- !u!114 &3120754185335775534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6853454031820601663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!114 &3992592145963563741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,13 +322,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SelectionIndicator: {fileID: 9105694441207156631}
-  NavMeshObstacle: {fileID: 5051987900954021386}
   CanBeAttackedIndicator: {fileID: 6735800335440375920}
+  Controller: {fileID: 5636402167801006196}
+--- !u!114 &5636402167801006196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6853454031820601663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8074405c0c304d93b46324c7848c9697, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   Type: 1
-  MoveRange: 1
+  Speed: 1
   AttackRange: 5
-  PositionVelocity: 5
   BodyRadius: 0.125
+  PositionVelocity: 5
+  NavMeshObstacle: {fileID: 5051987900954021386}
 --- !u!1 &9105694441207156631
 GameObject:
   m_ObjectHideFlags: 0
