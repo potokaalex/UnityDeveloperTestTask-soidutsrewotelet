@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Game.Code.Core;
+using UnityEngine;
 
-namespace Game.Code.Gameplay.Unit
+namespace Game.Code.Gameplay.Unit.View
 {
     public class UnitRangeView : MonoBehaviour
     {
@@ -8,9 +9,9 @@ namespace Game.Code.Gameplay.Unit
         public MeshFilter AttackMeshFilter;
         public float CircleThickness;
         
-        public void ViewMove(float radius, Vector3 center) => View(MoveMeshFilter, radius, center);
+        public void ViewMove(Vector3 center, float radius) => View(MoveMeshFilter, radius, center);
 
-        public void ViewAttack(float radius, Vector3 center) => View(AttackMeshFilter, radius, center);
+        public void ViewAttack(Vector3 center, float radius) => View(AttackMeshFilter, radius, center);
 
         private void View(MeshFilter meshFilter, float radius, Vector3 position)
         {

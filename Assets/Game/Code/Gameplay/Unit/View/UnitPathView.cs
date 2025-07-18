@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using Game.Code.Core;
+using UnityEngine;
 using UnityEngine.Pool;
 
-namespace Game.Code.Gameplay.Unit
+namespace Game.Code.Gameplay.Unit.View
 {
     public class UnitPathView : MonoBehaviour
     {

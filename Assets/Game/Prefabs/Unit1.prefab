@@ -323,7 +323,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SelectionIndicator: {fileID: 9105694441207156631}
   CanBeAttackedIndicator: {fileID: 6735800335440375920}
-  Controller: {fileID: 5636402167801006196}
 --- !u!114 &5636402167801006196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,9 +337,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 1
   Speed: 1
-  AttackRange: 5
+  AttackRadius: 5
   BodyRadius: 0.125
   PositionVelocity: 5
+  View: {fileID: 3992592145963563741}
   NavMeshObstacle: {fileID: 5051987900954021386}
 --- !u!1 &9105694441207156631
 GameObject:

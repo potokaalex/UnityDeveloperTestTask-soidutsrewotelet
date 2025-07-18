@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Game.Code.Gameplay.Unit
+namespace Game.Code.Core
 {
     public static class MathExtensions
     {

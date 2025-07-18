@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
-using Zenject;
 
 namespace Game.Code.Gameplay.Unit
 {
@@ -9,10 +8,7 @@ namespace Game.Code.Gameplay.Unit
     {
         public UnitsSpawnerPreset[] Presets;
         public List<UnitController> Prefabs;
-        private UnitsContainer _container;
-
-        [Inject]
-        public void Construct(UnitsContainer container) => _container = container;
+        private int _unitId;
 
         public override void OnNetworkSpawn()
         {
@@ -31,7 +27,7 @@ namespace Game.Code.Gameplay.Unit
             instance.NetworkObject.Spawn();
             instance.transform.position = spawnPoint.transform.position;
             instance.Team.Value = spawnPoint.Team;
-            _container.Add(instance, spawnPoint.Team);
+            instance.Id.Value = _unitId++;
         }
     }
 }

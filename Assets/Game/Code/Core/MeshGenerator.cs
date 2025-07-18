@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Game.Code.Gameplay
+namespace Game.Code.Core
 {
     public static class MeshGenerator
     {
