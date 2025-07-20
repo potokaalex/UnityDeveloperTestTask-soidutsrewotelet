@@ -1,4 +1,5 @@
-﻿using Game.Code.Core.Network;
+﻿using System;
+using Game.Code.Core.Network;
 using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit;
 using Unity.Netcode;
@@ -73,7 +74,6 @@ namespace Game.Code.Gameplay
         {
             if (_unitsSelector.HasSelected)
                 _unitsSelector.UnSelect(_unitsSelector.Selected);
-            ;
         }
 
         public bool IsHisTurn(PlayerController player)
@@ -81,6 +81,16 @@ namespace Game.Code.Gameplay
             if (!player)
                 return false;
             return player.Team == CurrentTeam;
+        }
+
+        public void FinishTurn() => FinishTurnServerRpc();
+
+        [ServerRpc(RequireOwnership = false)]
+        public void FinishTurnServerRpc(ServerRpcParams rpcParams = default)
+        {
+            var sender = rpcParams.Receive.SenderClientId;
+            if (_playersContainer.TryGet(sender, out var player) && IsHisTurn(player))
+                TurnTime = 0;
         }
 
         private void MoveNextTeam() => CurrentTeam = CurrentTeam == TeamType.A ? TeamType.B : TeamType.A;

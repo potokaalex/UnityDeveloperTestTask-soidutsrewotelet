@@ -4,6 +4,7 @@ using Game.Code.Gameplay.Player;
 using TMPro;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace Game.Code.Gameplay
@@ -15,6 +16,7 @@ namespace Game.Code.Gameplay
         public TextMeshProUGUI TurnTime;
         public TextMeshProUGUI AttackCount;
         public TextMeshProUGUI MoveCount;
+        public Button FinishTurnButton;
         private readonly CompositeDisposable _disposables = new();
         private MatchController _matchController;
         private IPlayerProvider _playerProvider;
@@ -31,6 +33,7 @@ namespace Game.Code.Gameplay
             _matchController.TurnNumberNV.OnChangeAsObservable().Subscribe(_ => ViewTurnNumber()).AddTo(_disposables);
             ViewTurnNumber();
             _matchController.CurrentTeamNV.OnChangeAsObservable().Subscribe(_ => ViewTurnName()).AddTo(_disposables);
+            _playerProvider.PlayerRP.Skip(1).Subscribe(_ => ViewTurnName()).AddTo(_disposables);
             ViewTurnName();
             _matchController.TurnTimeNV.OnChangeAsObservable().Subscribe(_ => ViewTurnTime()).AddTo(_disposables);
             ViewTurnTime();
@@ -38,6 +41,10 @@ namespace Game.Code.Gameplay
                 .Subscribe(_ => ViewAttackCount()).AddTo(_disposables);
             _playerProvider.PlayerRP.Select(p => p?.MoveCountNV.OnChangeAsObservable() ?? Observable.Empty<UniRx.Unit>()).Switch()
                 .Subscribe(_ => ViewMoveCount()).AddTo(_disposables);
+
+            _matchController.CurrentTeamNV.OnChangeAsObservable()
+                .Subscribe(_ => FinishTurnButton.gameObject.SetActive(_matchController.IsMyTurn)).AddTo(_disposables);
+            FinishTurnButton.OnClickAsObservable().Subscribe(_ => _matchController.FinishTurn()).AddTo(_disposables);
         }
 
         public void Dispose() => _disposables?.Dispose();
