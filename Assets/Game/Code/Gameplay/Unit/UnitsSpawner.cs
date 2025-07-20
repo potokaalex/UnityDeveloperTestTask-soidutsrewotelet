@@ -12,12 +12,14 @@ namespace Game.Code.Gameplay.Unit
 
         public override void OnNetworkSpawn()
         {
+            /*
             if (IsServer)
             {
                 foreach (var preset in Presets)
                 foreach (var spawnPoint in preset.SpawnPoints)
                     CreateUnit(preset, spawnPoint);
             }
+            */
         }
 
         private void CreateUnit(UnitsSpawnerPreset preset, UnitSpawnPoint spawnPoint)

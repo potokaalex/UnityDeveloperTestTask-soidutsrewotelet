@@ -15,14 +15,14 @@ namespace Game.Code.Gameplay.Player
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer)
-                NetworkManager.OnClientConnectedCallback += OnClientConnected;
+            //if (IsServer)
+            //    NetworkManager.OnClientConnectedCallback += OnClientConnected;
         }
 
         public override void OnNetworkDespawn()
         {
-            if (IsServer)
-                NetworkManager.OnClientConnectedCallback -= OnClientConnected;
+            //if (IsServer)
+            //    NetworkManager.OnClientConnectedCallback -= OnClientConnected;
         }
 
         private void OnClientConnected(ulong clientId)

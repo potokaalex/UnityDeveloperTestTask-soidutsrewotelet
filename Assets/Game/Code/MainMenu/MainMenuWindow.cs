@@ -1,9 +1,8 @@
-﻿using Game.Code.Gameplay.Hud;
-using UniRx;
+﻿using UniRx;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Zenject;
 
 namespace Game.Code.MainMenu
 {
@@ -13,10 +12,6 @@ namespace Game.Code.MainMenu
         public Button StartClientButton;
         public Button ExitButton;
         private readonly CompositeDisposable _disposables = new();
-        private HudWindow _hudWindow;
-
-        [Inject]
-        public void Construct(HudWindow hudWindow) => _hudWindow = hudWindow;
 
         public void OnEnable()
         {
@@ -29,20 +24,20 @@ namespace Game.Code.MainMenu
 
         private void StartServer()
         {
+            NetworkManager.Singleton.OnServerStarted += LoadGameplay;
             NetworkManager.Singleton.StartServer();
-            Close();
+
+            void LoadGameplay()
+            {
+                NetworkManager.Singleton.SceneManager.LoadScene("Gameplay", LoadSceneMode.Single);
+                NetworkManager.Singleton.OnServerStarted -= LoadGameplay;
+            }
         }
 
         private void StartClient()
         {
-            NetworkManager.Singleton.StartClient();
-            Close();
-        }
-
-        private void Close()
-        {
-            gameObject.SetActive(false);
-            _hudWindow.Show();
+            if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
+                NetworkManager.Singleton.StartClient();
         }
 
         private void Exit()
