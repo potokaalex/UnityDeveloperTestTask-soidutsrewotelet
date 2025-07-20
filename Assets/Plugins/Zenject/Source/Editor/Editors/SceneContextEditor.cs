@@ -5,7 +5,7 @@ using UnityEditor;
 namespace Zenject
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(SceneContext))]
+    [CustomEditor(typeof(SceneContext), true)]
     [NoReflectionBaking]
     public class SceneContextEditor : RunnableContextEditor
     {

@@ -1,5 +1,7 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace Game.Code.Core.Network
 {
@@ -16,7 +18,8 @@ namespace Game.Code.Core.Network
 
         public NetworkObject Instantiate(ulong ownerClientId, Vector3 position, Quaternion rotation)
         {
-            var instance = _instantiator.InstantiatePrefabForComponent<NetworkObject>(_gameObject);
+            var container = ProjectContext.Instance.Container.Resolve<SceneContextRegistry>().GetContainerForScene(SceneManager.GetActiveScene());
+            var instance = _instantiator.InstantiatePrefabForComponent<NetworkObject>(container, _gameObject);
             instance.transform.position = position;
             instance.transform.rotation = rotation;
             return instance;

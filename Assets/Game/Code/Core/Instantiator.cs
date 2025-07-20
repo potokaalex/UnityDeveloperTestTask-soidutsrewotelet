@@ -9,13 +9,16 @@ namespace Game.Code.Core
 
         public Instantiator(DiContainer container) => _container = container;
 
-        public T InstantiatePrefabForComponent<T>(GameObject go) where T : Component
+        public T InstantiatePrefabForComponent<T>(GameObject gameObject) where T : Component =>
+            InstantiatePrefabForComponent<T>(_container, gameObject);
+
+        public T InstantiatePrefabForComponent<T>(DiContainer container, GameObject gameObject) where T : Component
         {
-            var wasActive = go.activeSelf;
-            go.SetActive(false);
-            var instance = Object.Instantiate(go);
-            go.SetActive(wasActive);
-            _container.InjectGameObject(instance);
+            var wasActive = gameObject.activeSelf;
+            gameObject.SetActive(false);
+            var instance = Object.Instantiate(gameObject);
+            gameObject.SetActive(wasActive);
+            container.InjectGameObject(instance);
             instance.SetActive(wasActive);
             return instance.GetComponentInChildren<T>();
         }

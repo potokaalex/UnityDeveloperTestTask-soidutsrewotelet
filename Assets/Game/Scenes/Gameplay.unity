@@ -2053,7 +2053,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 612113673}
-  - component: {fileID: 612113674}
+  - component: {fileID: 612113676}
   - component: {fileID: 612113675}
   m_Layer: 0
   m_Name: Startup
@@ -2077,7 +2077,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &612113674
+--- !u!114 &612113675
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2086,7 +2086,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 612113672}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89715ad69b973a14899afa2c6730b30b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fb1594d440848e08c5fdd3ea1fa91c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GroundController: {fileID: 1526921188}
+  CameraController: {fileID: 963194229}
+  PlayersSpawner: {fileID: 356539064}
+  MatchController: {fileID: 1262655500}
+  HudWindowPrefab: {fileID: 2511363810217007554, guid: d9fb3da0fc5ad0f408be603c3e167244, type: 3}
+  UnitRangeView: {fileID: 863502178}
+  UnitPathView: {fileID: 1900188751}
+--- !u!114 &612113676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612113672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 133ddf777c7549afa8343d56e6b4f380, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _scriptableObjectInstallers: []
@@ -2109,25 +2128,6 @@ MonoBehaviour:
   _parentNewObjectsUnderSceneContext: 0
   _contractNames: []
   _parentContractNames: []
---- !u!114 &612113675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 612113672}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fb1594d440848e08c5fdd3ea1fa91c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GroundController: {fileID: 1526921188}
-  CameraController: {fileID: 963194229}
-  PlayersSpawner: {fileID: 356539064}
-  MatchController: {fileID: 1262655500}
-  HudWindowPrefab: {fileID: 2511363810217007554, guid: d9fb3da0fc5ad0f408be603c3e167244, type: 3}
-  UnitRangeView: {fileID: 863502178}
-  UnitPathView: {fileID: 1900188751}
 --- !u!1001 &631671409
 PrefabInstance:
   m_ObjectHideFlags: 0
