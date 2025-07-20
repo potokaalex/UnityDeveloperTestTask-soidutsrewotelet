@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Unity.Netcode;
 using UnityEngine;
+using Random = System.Random;
 
 namespace Game.Code.Gameplay.Obstacle
 {
@@ -14,7 +13,7 @@ namespace Game.Code.Gameplay.Obstacle
 
         public void Spawn(int seed)
         {
-            var random = new System.Random(seed);
+            var random = new Random(seed);
             foreach (var preset in Presets)
                 CreateObstacles(preset, random);
         }
@@ -26,7 +25,7 @@ namespace Game.Code.Gameplay.Obstacle
             Gizmos.color = Color.white;
         }
 
-        private void CreateObstacles(ObstacleSpawnPreset preset, System.Random random)
+        private void CreateObstacles(ObstacleSpawnPreset preset, Random random)
         {
             var count = random.Next(preset.MinCount, preset.MaxCount);
 
@@ -45,6 +44,6 @@ namespace Game.Code.Gameplay.Obstacle
             instance.transform.position = position;
         }
 
-        private float NextFloat(System.Random random, float min, float max) => (float)random.NextDouble() * (max - min) + min;
+        private float NextFloat(Random random, float min, float max) => (float)random.NextDouble() * (max - min) + min;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Game.Code.Core.Network;
-using Game.Code.Core.Network.LifeTime;
 using Zenject;
 
 namespace Game.Code.Core
@@ -16,7 +15,6 @@ namespace Game.Code.Core
         {
             Container.BindInterfacesTo<NetworkController>().AsSingle();
             Container.BindInterfacesTo<NetworkPrefabsController>().AsSingle();
-            Container.BindInterfacesTo<NetworkLifetimeController>().AsSingle().CopyIntoAllSubContainers();
         }
     }
 }

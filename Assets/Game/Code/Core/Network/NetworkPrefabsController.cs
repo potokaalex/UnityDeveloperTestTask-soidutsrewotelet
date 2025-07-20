@@ -12,10 +12,9 @@ namespace Game.Code.Core.Network
 
         public void Initialize()
         {
-            UnityEngine.Debug.Log("Register prefabs handler");
             foreach (var prefab in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
                 NetworkManager.Singleton.PrefabHandler.AddHandler(prefab.Prefab,
-                    new CustomNetworkPrefabInstanceHandler(prefab.Prefab, _instantiator));   
+                    new CustomNetworkPrefabInstanceHandler(prefab.Prefab, _instantiator));
         }
 
         public void Dispose()

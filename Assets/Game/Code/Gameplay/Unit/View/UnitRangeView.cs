@@ -8,7 +8,7 @@ namespace Game.Code.Gameplay.Unit.View
         public MeshFilter MoveMeshFilter;
         public MeshFilter AttackMeshFilter;
         public float CircleThickness;
-        
+
         public void ViewMove(Vector3 center, float radius) => View(MoveMeshFilter, radius, center);
 
         public void ViewAttack(Vector3 center, float radius) => View(AttackMeshFilter, radius, center);

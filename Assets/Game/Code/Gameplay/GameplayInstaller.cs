@@ -8,7 +8,7 @@ namespace Game.Code.Gameplay
 {
     public class GameplayInstaller : MonoInstaller
     {
-        public GroundController GroundController;
+        public MapController MapController;
         public CameraController CameraController;
         public PlayersSpawner PlayersSpawner;
         public MatchController MatchController;
@@ -18,7 +18,7 @@ namespace Game.Code.Gameplay
 
         public override void InstallBindings()
         {
-            Container.BindInterfacesTo<GroundController>().FromInstance(GroundController).AsSingle();
+            Container.Bind<MapController>().FromInstance(MapController).AsSingle();
             Container.Bind<CameraController>().FromInstance(CameraController).AsSingle();
             BindPlayer();
             Container.Bind<MatchController>().FromInstance(MatchController).AsSingle();
@@ -30,7 +30,7 @@ namespace Game.Code.Gameplay
 
         private void BindPlayer()
         {
-            Container.BindInterfacesTo<PlayersSpawner>().FromInstance(PlayersSpawner).AsSingle();
+            Container.Bind<PlayersSpawner>().FromInstance(PlayersSpawner).AsSingle();
             Container.BindInterfacesAndSelfTo<PlayerInput>().AsSingle();
             Container.BindInterfacesAndSelfTo<PlayersContainer>()
                 .AsSingle(); //no need to have a container on all clients, but I create all players on all clients.

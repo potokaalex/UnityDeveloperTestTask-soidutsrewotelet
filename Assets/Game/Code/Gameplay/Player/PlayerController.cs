@@ -20,7 +20,7 @@ namespace Game.Code.Gameplay.Player
 
         public NetworkVariable<int> AttackCountNV { get; } = new(1);
 
-        public int MoveCount  { get => MoveCountNV.Value; set => MoveCountNV.Value = value; }
+        public int MoveCount { get => MoveCountNV.Value; set => MoveCountNV.Value = value; }
 
         public NetworkVariable<int> MoveCountNV { get; } = new(1);
 

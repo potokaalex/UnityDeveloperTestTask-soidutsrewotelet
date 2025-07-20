@@ -1,36 +1,29 @@
 ﻿using System.Linq;
 using Game.Code.Core;
-using Game.Code.Core.Network;
-using Game.Code.Core.Network.LifeTime;
 using UnityEngine;
 using Zenject;
 
 namespace Game.Code.Gameplay.Player
 {
-    public class PlayersSpawner : MonoBehaviour, IOnClientConnectedReceiver
+    public class PlayersSpawner : MonoBehaviour
     {
         public PlayerController PlayerPrefab;
         private int _lastId;
         private PlayersContainer _container;
         private Instantiator _instantiator;
-        private INetworkController _networkController;
 
         [Inject]
-        public void Construct(PlayersContainer container, Instantiator instantiator, INetworkController networkController)
+        public void Construct(PlayersContainer container, Instantiator instantiator)
         {
-            _networkController = networkController;
             _instantiator = instantiator;
             _container = container;
         }
 
-        public void OnClientConnected(ulong clientId)
+        public void Spawn(ulong clientId)
         {
-            if (_networkController.IsServer)
-            {
-                var instance = _instantiator.InstantiatePrefabForComponent<PlayerController>(PlayerPrefab.gameObject);
-                instance.Initialize(clientId, GetTeam());
-                instance.NetworkObject.SpawnWithOwnership(clientId);
-            }
+            var instance = _instantiator.InstantiatePrefabForComponent<PlayerController>(PlayerPrefab.gameObject);
+            instance.Initialize(clientId, GetTeam());
+            instance.NetworkObject.SpawnWithOwnership(clientId);
         }
 
         private TeamType GetTeam()

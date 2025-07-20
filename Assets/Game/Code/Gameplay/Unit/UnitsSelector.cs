@@ -2,8 +2,6 @@
 {
     public class UnitsSelector
     {
-        private readonly MatchController _matchController;
-
         public UnitController Selected { get; private set; }
 
         public bool HasSelected => Selected;

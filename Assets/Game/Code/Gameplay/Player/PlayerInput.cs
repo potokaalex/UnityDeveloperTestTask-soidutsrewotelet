@@ -25,11 +25,11 @@ namespace Game.Code.Gameplay.Player
 
             if (Input.GetMouseButtonDown(0))
             {
-                if (_unitsSelector.HasSelected && _unitsSelector.Selected.IsDestinationSet)
+                if (_unitsSelector.HasSelected && _unitsSelector.Selected.IsDestinationValid)
                     _unitsSelector.Selected.ClearDestination();
 
                 if (TryGetHit(out var hit) && hit.transform.TryGetComponent<UnitController>(out var unit))
-                    unit.Interact();
+                    unit.Select();
             }
             else if (Input.GetMouseButtonDown(1))
             {

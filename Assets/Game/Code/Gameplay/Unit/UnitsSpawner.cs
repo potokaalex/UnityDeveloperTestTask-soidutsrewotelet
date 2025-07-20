@@ -11,7 +11,6 @@ namespace Game.Code.Gameplay.Unit
         public UnitsSpawnerPreset[] Presets;
         public List<UnitController> Prefabs;
         private Instantiator _instantiator;
-        private int _lastId;
 
         [Inject]
         public void Construct(Instantiator instantiator) => _instantiator = instantiator;
@@ -22,12 +21,12 @@ namespace Game.Code.Gameplay.Unit
             foreach (var spawnPoint in preset.SpawnPoints)
                 CreateUnit(preset, spawnPoint);
         }
-        
+
         private void CreateUnit(UnitsSpawnerPreset preset, UnitSpawnPoint spawnPoint)
         {
             var prefab = Prefabs.First(x => x.Type == preset.Type).gameObject;
             var instance = _instantiator.InstantiatePrefabForComponent<UnitController>(prefab);
-            instance.Initialize(spawnPoint.transform.position, _lastId++, spawnPoint.Team);
+            instance.Initialize(spawnPoint.transform.position, spawnPoint.Team);
             instance.NetworkObject.Spawn();
         }
     }

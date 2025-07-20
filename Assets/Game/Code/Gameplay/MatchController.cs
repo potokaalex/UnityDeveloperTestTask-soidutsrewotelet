@@ -9,7 +9,7 @@ namespace Game.Code.Gameplay
 {
     public class MatchController : NetworkBehaviour
     {
-        public float TurnDuration = 10;
+        public float TurnDuration = 60;
         private PlayersContainer _playersContainer;
         private IPlayerProvider _playerProvider;
         private UnitsSelector _unitsSelector;
@@ -26,15 +26,7 @@ namespace Game.Code.Gameplay
 
         public NetworkVariable<TeamType> CurrentTeamNV { get; } = new(TeamType.A);
 
-        public bool IsMyTurn
-        {
-            get
-            {
-                if (!_playerProvider.Player)
-                    return false;
-                return _playerProvider.Player.Team == CurrentTeam;
-            }
-        }
+        public bool IsMyTurn => IsHisTurn(_playerProvider.Player);
 
         [Inject]
         public void Construct(PlayersContainer playersContainer, IPlayerProvider playerProvider, UnitsSelector unitsSelector)
@@ -44,7 +36,7 @@ namespace Game.Code.Gameplay
             _playersContainer = playersContainer;
         }
 
-        public override void OnNetworkSpawn()
+        public void Initialize()
         {
             if (IsServer)
                 TurnTime = TurnDuration;
@@ -71,6 +63,7 @@ namespace Game.Code.Gameplay
                 {
                     nextPlayer.AttackCount = 1;
                     nextPlayer.MoveCount = 1;
+                    //options
                 }
             }
         }
@@ -80,6 +73,14 @@ namespace Game.Code.Gameplay
         {
             if (_unitsSelector.HasSelected)
                 _unitsSelector.UnSelect(_unitsSelector.Selected);
+            ;
+        }
+
+        public bool IsHisTurn(PlayerController player)
+        {
+            if (!player)
+                return false;
+            return player.Team == CurrentTeam;
         }
 
         private void MoveNextTeam() => CurrentTeam = CurrentTeam == TeamType.A ? TeamType.B : TeamType.A;

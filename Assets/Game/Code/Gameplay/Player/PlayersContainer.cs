@@ -14,14 +14,14 @@ namespace Game.Code.Gameplay.Player
         public void Add(PlayerController player)
         {
             _players.Add(player);
-            if (player.IsOwner) 
+            if (player.IsOwner)
                 Player = player;
         }
 
         public void Remove(PlayerController player)
         {
             _players.Remove(player);
-            if (player == Player) 
+            if (player == Player)
                 Player = null;
         }
 
@@ -36,7 +36,7 @@ namespace Game.Code.Gameplay.Player
             player = Get(team);
             return player;
         }
-        
+
         public bool TryGet(ulong clientId, out PlayerController outPlayer)
         {
             foreach (var player in _players)

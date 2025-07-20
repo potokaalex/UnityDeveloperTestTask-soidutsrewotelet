@@ -23,22 +23,20 @@ namespace Game.Code.Gameplay.Unit.View
 
         public void Setup(TeamType team)
         {
-            if(team != TeamType.None)
+            if (team != TeamType.None)
                 MeshRenderer.sharedMaterial = MaterialsPerTeam[team];
         }
 
-        public void ViewSelect(Vector3 center, float speed)
-        {
-            SelectionIndicator.SetActive(true);
-            _rangeView.ViewMove(center, speed);
-        }
+        public void ViewSelect() => SelectionIndicator.SetActive(true);
 
-        public void ViewUnSelect(List<UnitController> enemies)
+        public void ViewUnSelect() => SelectionIndicator.SetActive(false);
+
+        public void ViewMove(Vector3 center, float speed) => _rangeView.ViewMove(center, speed);
+        
+        public void ClearMove()
         {
-            SelectionIndicator.SetActive(false);
             _rangeView.ClearMove();
             _pathView.Clear();
-            ClearAttack(enemies);
         }
 
         public void OnDestinationChanged(bool value, Vector3[] pathPoints)
@@ -58,7 +56,7 @@ namespace Game.Code.Gameplay.Unit.View
             _rangeView.ViewAttack(point, radius);
         }
 
-        private void ClearAttack(List<UnitController> enemies)
+        public void ClearAttack(List<UnitController> enemies)
         {
             foreach (var unit in enemies)
                 unit.View.CanBeAttackedIndicator.SetActive(false);

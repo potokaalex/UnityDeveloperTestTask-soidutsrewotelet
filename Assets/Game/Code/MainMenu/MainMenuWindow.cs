@@ -1,5 +1,6 @@
 ﻿using UniRx;
 using Unity.Netcode;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -43,7 +44,7 @@ namespace Game.Code.MainMenu
         private void Exit()
         {
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
+            EditorApplication.isPlaying = false;
 #else
             Application.Quit();
 #endif

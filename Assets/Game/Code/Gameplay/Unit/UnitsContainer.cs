@@ -17,10 +17,10 @@ namespace Game.Code.Gameplay.Unit
                 outList.Add(unit);
         }
 
-        public UnitController Get(int id)
+        public UnitController Get(ulong id)
         {
             foreach (var unit in _units)
-                if (unit.Id.Value == id)
+                if (unit.Id == id)
                     return unit;
             return null;
         }
