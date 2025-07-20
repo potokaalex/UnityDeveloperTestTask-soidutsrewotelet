@@ -23,21 +23,25 @@ namespace Game.Code.Gameplay
                 CreateGround(_seed);
                 UnitsSpawner.Spawn();
                 NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+                NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisConnected;
             }
 
             MatchController.Initialize();
         }
 
-        public override void OnNetworkDespawn() => NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        public override void OnNetworkDespawn()
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisConnected;
+        }
 
         public void OnClientConnected(ulong clientId)
         {
-            if (IsServer)
-            {
-                CreateGroundClientRpc(_seed, new ClientRpcParams().For(clientId));
-                PlayersSpawner.Spawn(clientId);
-            }
+            CreateGroundClientRpc(_seed, new ClientRpcParams().For(clientId));
+            PlayersSpawner.Spawn(clientId);
         }
+
+        public void OnClientDisConnected(ulong clientId) => PlayersSpawner.Despawn(clientId, OwnerClientId);
 
         [ClientRpc]
         public void CreateGroundClientRpc(int seed, ClientRpcParams _) => CreateGround(seed);

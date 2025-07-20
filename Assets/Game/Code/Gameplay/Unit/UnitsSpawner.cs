@@ -28,6 +28,7 @@ namespace Game.Code.Gameplay.Unit
             var instance = _instantiator.InstantiatePrefabForComponent<UnitController>(prefab);
             instance.Initialize(spawnPoint.transform.position, spawnPoint.Team);
             instance.NetworkObject.Spawn();
+            instance.NetworkObject.DontDestroyWithOwner = true;
         }
     }
 }

@@ -50,7 +50,7 @@ namespace Game.Code.Gameplay.Unit
                 AttackServerRpc();
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc]
         public void AttackServerRpc(ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;

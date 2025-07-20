@@ -31,7 +31,7 @@ namespace Game.Code.Gameplay.Unit
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc]
         public void SelectServerRpc(ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;
@@ -43,10 +43,10 @@ namespace Game.Code.Gameplay.Unit
         [ClientRpc]
         public void SelectClientRpc(ClientRpcParams _) => _unitsSelector.Select(_unit);
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc]
         public void OnSelectServerRpc() => Model.NavMeshObstacle.enabled = false;
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc]
         public void OnUnSelectServerRpc() => Model.NavMeshObstacle.enabled = true;
     }
 }

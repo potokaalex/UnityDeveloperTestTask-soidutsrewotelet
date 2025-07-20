@@ -67,7 +67,7 @@ namespace Game.Code.Gameplay.Unit
 
         public void Clear() => View.ClearMove();
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc]
         public void SetDestinationServerRpc(Vector3 point, ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;
@@ -96,7 +96,7 @@ namespace Game.Code.Gameplay.Unit
             Attack.CalculateAttack(Helper.IsDestinationValid ? Model.PathPoints[^1] : transform.position);
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc]
         public void MoveDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;
@@ -114,7 +114,7 @@ namespace Game.Code.Gameplay.Unit
         [ClientRpc]
         public void OnMoveDestinationClientRpc(ClientRpcParams _) => _selector.UnSelect(_unit);
 
-        [ServerRpc(RequireOwnership = false)]
+        [ServerRpc]
         public void ClearDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
             Model.PathPoints = Array.Empty<Vector3>();
