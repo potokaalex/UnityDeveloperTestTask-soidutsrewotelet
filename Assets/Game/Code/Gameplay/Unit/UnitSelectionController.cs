@@ -21,10 +21,10 @@ namespace Game.Code.Gameplay.Unit
             _playersContainer = playersContainer;
             _unitsSelector = unitsSelector;
         }
-        
+
         public void Select(UnitController unit)
         {
-            if (!IsServer)
+            if (!IsServer && IsOwner)
             {
                 _unit = unit;
                 SelectServerRpc();

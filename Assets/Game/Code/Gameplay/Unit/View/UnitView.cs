@@ -32,7 +32,7 @@ namespace Game.Code.Gameplay.Unit.View
         public void ViewUnSelect() => SelectionIndicator.SetActive(false);
 
         public void ViewMove(Vector3 center, float speed) => _rangeView.ViewMove(center, speed);
-        
+
         public void ClearMove()
         {
             _rangeView.ClearMove();

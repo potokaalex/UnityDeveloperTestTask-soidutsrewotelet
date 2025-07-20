@@ -25,13 +25,15 @@ namespace Game.Code.Gameplay.Player
         public void Spawn(ulong clientId)
         {
             var instance = _instantiator.InstantiatePrefabForComponent<PlayerController>(PlayerPrefab.gameObject);
-            instance.Initialize(clientId, GetTeam());
+            var team = GetTeam();
+            instance.Initialize(clientId, team);
             instance.NetworkObject.SpawnWithOwnership(clientId);
 
             using var d = UnityEngine.Pool.ListPool<UnitController>.Get(out var units);
             _unitsContainer.Get(units);
             foreach (var unit in units)
-                unit.NetworkObject.ChangeOwnership(clientId);
+                if (unit.Team == instance.Team)
+                    unit.NetworkObject.ChangeOwnership(clientId);
         }
 
         public void Despawn(ulong clientId, ulong serverClientId)

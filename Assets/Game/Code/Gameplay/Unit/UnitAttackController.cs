@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Code.Core.Network;
 using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit.View;
 using Unity.Netcode;
@@ -47,11 +48,11 @@ namespace Game.Code.Gameplay.Unit
         public void Attack(UnitController unit)
         {
             if (unit != _unit)
-                AttackServerRpc();
+                AttackServerRpc(unit.Id);
         }
 
         [ServerRpc]
-        public void AttackServerRpc(ServerRpcParams rpcParams = default)
+        public void AttackServerRpc(ulong unitId, ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;
 
@@ -59,12 +60,16 @@ namespace Game.Code.Gameplay.Unit
                 return;
 
             using var d = GetUnitsForAttack(transform.position, player.Team, out var units);
-            if (units.Any(x => x.Id == sender))
+            if (units.Any(x => x.Id == unitId))
             {
-                _container.Get(sender).NetworkObject.Despawn();
+                _container.Get(unitId).NetworkObject.Despawn();
                 player.AttackCount -= 1;
+                AttackClientRpc(new ClientRpcParams().For(sender));
             }
         }
+
+        [ClientRpc]
+        private void AttackClientRpc(ClientRpcParams _) => _selector.UnSelect(_unit);
 
         public void CalculateAttack(Vector3 point)
         {
@@ -85,7 +90,6 @@ namespace Game.Code.Gameplay.Unit
             foreach (var unit in units)
                 if (Helper.AreEnemies(playerTeam, unit.Team) && unit.IsInRange(point, FullAttackRadius))
                     outList.Add(unit);
-
             return result;
         }
 

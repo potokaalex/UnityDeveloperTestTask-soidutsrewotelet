@@ -32,13 +32,17 @@ namespace Game.Code.Gameplay
         {
             _matchController.TurnNumberNV.OnChangeAsObservable().Subscribe(_ => ViewTurnNumber()).AddTo(_disposables);
             ViewTurnNumber();
+
             _matchController.CurrentTeamNV.OnChangeAsObservable().Subscribe(_ => ViewTurnName()).AddTo(_disposables);
             _playerProvider.PlayerRP.Skip(1).Subscribe(_ => ViewTurnName()).AddTo(_disposables);
             ViewTurnName();
+
             _matchController.TurnTimeNV.OnChangeAsObservable().Subscribe(_ => ViewTurnTime()).AddTo(_disposables);
             ViewTurnTime();
+
             _playerProvider.PlayerRP.Select(p => p?.AttackCountNV.OnChangeAsObservable() ?? Observable.Empty<UniRx.Unit>()).Switch()
                 .Subscribe(_ => ViewAttackCount()).AddTo(_disposables);
+
             _playerProvider.PlayerRP.Select(p => p?.MoveCountNV.OnChangeAsObservable() ?? Observable.Empty<UniRx.Unit>()).Switch()
                 .Subscribe(_ => ViewMoveCount()).AddTo(_disposables);
 

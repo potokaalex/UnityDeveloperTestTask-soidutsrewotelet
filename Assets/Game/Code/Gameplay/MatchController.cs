@@ -1,5 +1,4 @@
-﻿using System;
-using Game.Code.Core.Network;
+﻿using Game.Code.Core.Network;
 using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit;
 using Unity.Netcode;
@@ -14,6 +13,7 @@ namespace Game.Code.Gameplay
         private PlayersContainer _playersContainer;
         private IPlayerProvider _playerProvider;
         private UnitsSelector _unitsSelector;
+        private UnitsContainer _unitsContainer;
 
         public float TurnTime { get => TurnTimeNV.Value; private set => TurnTimeNV.Value = value; }
 
@@ -29,9 +29,15 @@ namespace Game.Code.Gameplay
 
         public bool IsMyTurn => IsHisTurn(_playerProvider.Player);
 
+        public NetworkVariable<TeamType> WinnerNV { get; } = new();
+
+        public TeamType Winner { get => WinnerNV.Value; set => WinnerNV.Value = value; }
+
         [Inject]
-        public void Construct(PlayersContainer playersContainer, IPlayerProvider playerProvider, UnitsSelector unitsSelector)
+        public void Construct(PlayersContainer playersContainer, IPlayerProvider playerProvider, UnitsSelector unitsSelector,
+            UnitsContainer unitsContainer)
         {
+            _unitsContainer = unitsContainer;
             _unitsSelector = unitsSelector;
             _playerProvider = playerProvider;
             _playersContainer = playersContainer;
@@ -45,12 +51,14 @@ namespace Game.Code.Gameplay
 
         public void Update()
         {
-            if (!IsSpawned || !IsServer)
+            if (!IsSpawned || !IsServer || Winner != TeamType.None)
+                return;
+
+            if (CheckForWinner())
                 return;
 
             TurnTime -= Time.deltaTime;
             var player = _playersContainer.Get(CurrentTeam);
-
             if (TurnTime <= 0 || (player && !player.CanAction))
             {
                 MoveNextTeam();
@@ -91,6 +99,23 @@ namespace Game.Code.Gameplay
             var sender = rpcParams.Receive.SenderClientId;
             if (_playersContainer.TryGet(sender, out var player) && IsHisTurn(player))
                 TurnTime = 0;
+        }
+
+        private bool CheckForWinner()
+        {
+            using var d = UnityEngine.Pool.ListPool<UnitController>.Get(out var units);
+            _unitsContainer.Get(units);
+
+            if (units.Count > 0)
+            {
+                var team = units[0].Team;
+                foreach (var unit in units)
+                    if (unit.Team != team)
+                        return false;
+            }
+
+            Winner = CurrentTeam;
+            return true;
         }
 
         private void MoveNextTeam() => CurrentTeam = CurrentTeam == TeamType.A ? TeamType.B : TeamType.A;
