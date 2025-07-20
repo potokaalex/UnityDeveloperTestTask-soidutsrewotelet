@@ -1,4 +1,5 @@
 ﻿using Game.Code.Gameplay.Player;
+using Game.Code.Gameplay.Unit;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -10,6 +11,7 @@ namespace Game.Code.Gameplay
         public float TurnDuration = 60;
         private PlayersContainer _playersContainer;
         private IPlayerProvider _playerProvider;
+        private UnitsSelector _unitsSelector;
 
         public float TurnTime { get => TurnTimeNV.Value; private set => TurnTimeNV.Value = value; }
 
@@ -34,8 +36,9 @@ namespace Game.Code.Gameplay
         }
 
         [Inject]
-        public void Construct(PlayersContainer playersContainer, IPlayerProvider playerProvider)
+        public void Construct(PlayersContainer playersContainer, IPlayerProvider playerProvider, UnitsSelector unitsSelector)
         {
+            _unitsSelector = unitsSelector;
             _playerProvider = playerProvider;
             _playersContainer = playersContainer;
         }
@@ -55,9 +58,17 @@ namespace Game.Code.Gameplay
                 {
                     MoveNextTeam();
                     TurnNumber++;
+                    UnSelectSelectedClientRpc();
                     TurnTime = TurnDuration;
                 }
             }
+        }
+
+        [ClientRpc]
+        public void UnSelectSelectedClientRpc()
+        {
+            if(_unitsSelector.HasSelected)
+                _unitsSelector.UnSelect(_unitsSelector.Selected);
         }
 
         private void MoveNextTeam() => CurrentTeam = CurrentTeam == TeamType.A ? TeamType.B : TeamType.A;

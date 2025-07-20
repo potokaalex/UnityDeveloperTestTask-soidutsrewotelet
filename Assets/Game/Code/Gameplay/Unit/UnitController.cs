@@ -26,8 +26,9 @@ namespace Game.Code.Gameplay.Unit
         private UnitsContainer _container;
         private bool _moving;
         private int _currentCornerIndex;
+        private MatchController _matchController;
 
-        public NetworkVariable<TeamType> Team { get; } = new(); //use spawn payload ?
+        public NetworkVariable<TeamType> Team { get; } = new();
 
         public NetworkVariable<int> Id { get; } = new();
 
@@ -40,8 +41,9 @@ namespace Game.Code.Gameplay.Unit
         public float FullAttackRadius => AttackRadius + BodyRadius;
 
         [Inject]
-        public void Construct(IPlayerProvider playerController, UnitsSelector selector, UnitsContainer container)
+        public void Construct(IPlayerProvider playerController, UnitsSelector selector, UnitsContainer container, MatchController matchController)
         {
+            _matchController = matchController;
             _playerProvider = playerController;
             _selector = selector;
             _container = container;
@@ -90,7 +92,7 @@ namespace Game.Code.Gameplay.Unit
 
         public void Interact()
         {
-            if (!IsServer && !IsEnemy)
+            if (!IsServer && !IsEnemy && _matchController.IsMyTurn)
                 _selector.Select(this);
         }
 
