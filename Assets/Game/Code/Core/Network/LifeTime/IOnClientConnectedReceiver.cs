@@ -1,4 +1,4 @@
-﻿namespace Game.Code.Core.Network
+﻿namespace Game.Code.Core.Network.LifeTime
 {
     public interface IOnClientConnectedReceiver
     {

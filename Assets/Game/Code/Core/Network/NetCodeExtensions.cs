@@ -9,5 +9,11 @@ namespace Game.Code.Core.Network
             clientRpcParams.Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } };
             return clientRpcParams;
         }
+
+        public static void Initialize<T>(this NetworkVariable<T> variable, NetworkBehaviour behaviour, T defaultValue)
+        {
+            variable.Initialize(behaviour);
+            variable.Value = defaultValue;
+        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using Game.Code.Core.Network.LifeTime;
 using Unity.Netcode;
 using Zenject;
 
@@ -7,9 +6,9 @@ namespace Game.Code.Core.Network
 {
     public class NetworkPrefabsController : IInitializable, IDisposable
     {
-        private readonly IInstantiator _instantiator;
+        private readonly Instantiator _instantiator;
 
-        public NetworkPrefabsController(IInstantiator instantiator) => _instantiator = instantiator;
+        public NetworkPrefabsController(Instantiator instantiator) => _instantiator = instantiator;
 
         public void Initialize()
         {

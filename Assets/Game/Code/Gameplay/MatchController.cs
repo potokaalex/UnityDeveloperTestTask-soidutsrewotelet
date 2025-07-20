@@ -9,38 +9,57 @@ namespace Game.Code.Gameplay
     {
         public float TurnDuration = 60;
         private PlayersContainer _playersContainer;
+        private IPlayerProvider _playerProvider;
 
-        public NetworkVariable<float> TurnTime { get; } = new();
+        public float TurnTime { get => TurnTimeNV.Value; private set => TurnTimeNV.Value = value; }
 
-        public NetworkVariable<int> TurnNumber { get; } = new();
+        public NetworkVariable<float> TurnTimeNV { get; } = new();
 
-        public NetworkVariable<TeamType> CurrentTeam { get; } = new(TeamType.A);
+        public int TurnNumber { get => TurnNumberNV.Value; private set => TurnNumberNV.Value = value; }
 
-        public bool IsMyTurn => false;//_playerController.Team.Value == CurrentTeam.Value;// взять игрока с 
-        
+        public NetworkVariable<int> TurnNumberNV { get; } = new(1);
+
+        public TeamType CurrentTeam { get => CurrentTeamNV.Value; set => CurrentTeamNV.Value = value; }
+
+        public NetworkVariable<TeamType> CurrentTeamNV { get; } = new(TeamType.A);
+
+        public bool IsMyTurn
+        {
+            get
+            {
+                if (!_playerProvider.Player)
+                    return false;
+                return _playerProvider.Player.Team == CurrentTeam;
+            }
+        }
+
         [Inject]
-        public void Construct(PlayersContainer playersContainer) => _playersContainer = playersContainer;
+        public void Construct(PlayersContainer playersContainer, IPlayerProvider playerProvider)
+        {
+            _playerProvider = playerProvider;
+            _playersContainer = playersContainer;
+        }
 
         public override void OnNetworkSpawn()
         {
-            if(IsServer)
-                TurnTime.Value = TurnDuration;
+            if (IsServer)
+                TurnTime = TurnDuration;   
         }
 
         public void Update()
         {
             if (IsSpawned && IsServer)
             {
-                TurnTime.Value -= Time.deltaTime;
-                if (TurnTime.Value <= 0 || (_playersContainer.TryGet(CurrentTeam.Value, out var currentPlayer) && !currentPlayer.CanAction))
+                TurnTime -= Time.deltaTime;
+                if (TurnTime <= 0 || (_playersContainer.TryGet(CurrentTeam, out var currentPlayer) && !currentPlayer.CanAction))
                 {
                     MoveNextTeam();
-                    TurnNumber.Value++;
-                    TurnTime.Value = TurnDuration;
+                    TurnNumber++;
+                    TurnTime = TurnDuration;
                 }
             }
         }
 
-        private void MoveNextTeam() => CurrentTeam.Value = CurrentTeam.Value == TeamType.A ? TeamType.B : TeamType.A;
+        private void MoveNextTeam() => CurrentTeam = CurrentTeam == TeamType.A ? TeamType.B : TeamType.A;
     }
 }

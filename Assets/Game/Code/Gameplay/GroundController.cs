@@ -1,23 +1,19 @@
 ﻿using Game.Code.Core.Network;
+using Game.Code.Core.Network.LifeTime;
 using Game.Code.Gameplay.Obstacle;
 using Unity.Netcode;
 using UnityEngine;
-using Zenject;
 
 namespace Game.Code.Gameplay
 {
-    public class GroundController : NetworkBehaviour, IInitializable, IOnClientConnectedReceiver
+    public class GroundController : NetworkBehaviour, IOnClientConnectedReceiver
     {
         public ObstaclesSpawner ObstaclesSpawner;
-        private INetworkController _networkController;
         private int _seed;
 
-        [Inject]
-        public void Construct(INetworkController networkController) => _networkController = networkController;
-
-        public void Initialize()
+        public override void OnNetworkSpawn()
         {
-            if (_networkController.IsServer)
+            if (IsServer)
             {
                 _seed = Random.Range(int.MinValue, int.MaxValue);
                 CreateGround(_seed);
@@ -26,7 +22,7 @@ namespace Game.Code.Gameplay
 
         public void OnClientConnected(ulong clientId)
         {
-            if (_networkController.IsServer)
+            if (IsServer)
                 CreateGroundClientRpc(_seed, new ClientRpcParams().For(clientId));
         }
 
