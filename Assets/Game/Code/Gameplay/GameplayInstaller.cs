@@ -15,6 +15,7 @@ namespace Game.Code.Gameplay
         public HudWindow HudWindowPrefab;
         public UnitRangeView UnitRangeView;
         public UnitPathView UnitPathView;
+        public EndWindow EndWindow;
 
         public override void InstallBindings()
         {
@@ -23,6 +24,7 @@ namespace Game.Code.Gameplay
             BindPlayer();
             Container.Bind<MatchController>().FromInstance(MatchController).AsSingle();
             BindUnit();
+            Container.BindInterfacesTo<EndWindow>().FromInstance(EndWindow).AsSingle();
 
             if (!NetworkManager.Singleton.IsServer)
                 Container.BindInterfacesTo<HudWindow>().FromComponentInNewPrefab(HudWindowPrefab).AsSingle();

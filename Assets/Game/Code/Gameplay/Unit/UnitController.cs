@@ -48,7 +48,7 @@ namespace Game.Code.Gameplay.Unit
         public void OnSelect()
         {
             Selection.OnSelectServerRpc();
-            View.ViewUnSelect();
+            View.ViewSelect();
             Movement.Setup(this);
             AttackController.Setup(this);
         }

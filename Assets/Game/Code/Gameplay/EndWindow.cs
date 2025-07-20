@@ -1,4 +1,5 @@
-﻿using Game.Code.Core;
+﻿using System;
+using Game.Code.Core;
 using TMPro;
 using UniRx;
 using UnityEngine;
@@ -6,7 +7,7 @@ using Zenject;
 
 namespace Game.Code.Gameplay
 {
-    public class EndWindow : MonoBehaviour
+    public class EndWindow : MonoBehaviour, IInitializable, IDisposable
     {
         public TextMeshProUGUI WinnerName;
         private readonly CompositeDisposable _disposables = new();
@@ -15,9 +16,8 @@ namespace Game.Code.Gameplay
         [Inject]
         public void Construct(MatchController matchController) => _matchController = matchController;
 
-        public void Awake()
+        public void Initialize()
         {
-            gameObject.SetActive(false);
             _matchController.WinnerNV.OnChangeAsObservable().Subscribe(_ =>
             {
                 gameObject.SetActive(true);
@@ -25,6 +25,6 @@ namespace Game.Code.Gameplay
             }).AddTo(_disposables);
         }
 
-        public void OnDestroy() => _disposables.Dispose();
+        public void Dispose() => _disposables.Dispose();
     }
 }
