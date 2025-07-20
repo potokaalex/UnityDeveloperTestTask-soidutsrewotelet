@@ -1,4 +1,4 @@
-# MiddleUnityDeveloperTestTask.
+# MiddleUnityDeveloperTestTask
 <img width="1612" height="901" alt="image" src="https://github.com/user-attachments/assets/71ee2157-bb9b-402c-ac30-4835d55e8deb" />
 
 ## Task
@@ -32,7 +32,7 @@
 - Resolve situations where one player avoids a fight, make the following draw resolution mechanism:
 - You cannot attack opponents who are behind an obstacle.
 ## Problems 
-- there is no clear division into client-server logic.
+- There is no clear division into client-server logic.
 
 ## Time
 - Deadline time: unlimited.
