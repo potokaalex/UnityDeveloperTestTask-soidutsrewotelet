@@ -27,6 +27,7 @@ namespace Game.Code.Gameplay.Unit
         private bool _moving;
         private int _currentCornerIndex;
         private MatchController _matchController;
+        private PlayersContainer _playersContainer;
 
         public NetworkVariable<TeamType> Team { get; } = new();
 
@@ -41,8 +42,10 @@ namespace Game.Code.Gameplay.Unit
         public float FullAttackRadius => AttackRadius + BodyRadius;
 
         [Inject]
-        public void Construct(IPlayerProvider playerController, UnitsSelector selector, UnitsContainer container, MatchController matchController)
+        public void Construct(IPlayerProvider playerController, UnitsSelector selector, UnitsContainer container, MatchController matchController,
+            PlayersContainer playersContainer)
         {
+            _playersContainer = playersContainer;
             _matchController = matchController;
             _playerProvider = playerController;
             _selector = selector;
@@ -110,9 +113,9 @@ namespace Game.Code.Gameplay.Unit
             View.ViewUnSelect(list);
         }
 
-        public void SetDestination(Vector3 point) => SetDestinationServerRpc(point);
+        public void SetDestination(Vector3 point) => SetDestinationServerRpc(point, _playerProvider.Player.Team);
 
-        public void MoveDestination() => MoveDestinationServerRpc();
+        public void MoveDestination() => MoveDestinationServerRpc(_playerProvider.Player.Team);
 
         public void ClearDestination() => ClearDestinationServerRpc();
 
@@ -129,8 +132,11 @@ namespace Game.Code.Gameplay.Unit
         private void OnUnSelectServerRpc() => NavMeshObstacle.enabled = true;
 
         [ServerRpc(RequireOwnership = false)]
-        private void SetDestinationServerRpc(Vector3 point, ServerRpcParams rpcParams = default)
+        private void SetDestinationServerRpc(Vector3 point, TeamType playerTeam, ServerRpcParams rpcParams = default)
         {
+            if (!_playersContainer.TryGet(playerTeam, out var player) || player.MoveCount <= 0)
+                return;
+
             PathPoints = Array.Empty<Vector3>();
 
             if (Vector3.Distance(transform.position, point) <= Speed)
@@ -154,11 +160,15 @@ namespace Game.Code.Gameplay.Unit
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void MoveDestinationServerRpc(ServerRpcParams rpcParams = default)
+        private void MoveDestinationServerRpc(TeamType playerTeam, ServerRpcParams rpcParams = default)
         {
+            if (!_playersContainer.TryGet(playerTeam, out var player) || player.MoveCount <= 0)
+                return;
+            
             if (IsDestinationSet)
             {
                 _moving = true;
+                player.MoveCount -= 1;
                 OnMoveDestinationClientRpc(
                     new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } } });
             }
@@ -185,11 +195,17 @@ namespace Game.Code.Gameplay.Unit
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void AttackServerRpc(int unitId, TeamType playTeam)
+        private void AttackServerRpc(int unitId, TeamType playerTeam, ServerRpcParams rpcParams = default)
         {
-            using var d = GetUnitsForAttack(transform.position, playTeam, out var units);
+            if (!_playersContainer.TryGet(playerTeam, out var player) || player.AttackCount <= 0)
+                return;
+
+            using var d = GetUnitsForAttack(transform.position, playerTeam, out var units);
             if (units.Select(x => x.Id.Value).Contains(unitId))
+            {
                 _container.Get(unitId).NetworkObject.Despawn();
+                player.AttackCount -= 1;
+            }
         }
 
         private void CalculateAttack(Vector3 point, ServerRpcParams rpcParams = default)

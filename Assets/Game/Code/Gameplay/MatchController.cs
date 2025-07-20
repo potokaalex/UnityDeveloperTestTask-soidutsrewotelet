@@ -1,4 +1,5 @@
-﻿using Game.Code.Gameplay.Player;
+﻿using Game.Code.Core.Network;
+using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace Game.Code.Gameplay
 {
     public class MatchController : NetworkBehaviour
     {
-        public float TurnDuration = 60;
+        public float TurnDuration = 10;
         private PlayersContainer _playersContainer;
         private IPlayerProvider _playerProvider;
         private UnitsSelector _unitsSelector;
@@ -46,28 +47,38 @@ namespace Game.Code.Gameplay
         public override void OnNetworkSpawn()
         {
             if (IsServer)
-                TurnTime = TurnDuration;   
+                TurnTime = TurnDuration;
         }
 
         public void Update()
         {
-            if (IsSpawned && IsServer)
+            if (!IsSpawned || !IsServer)
+                return;
+
+            TurnTime -= Time.deltaTime;
+            var player = _playersContainer.Get(CurrentTeam);
+
+            if (TurnTime <= 0 || (player && !player.CanAction))
             {
-                TurnTime -= Time.deltaTime;
-                if (TurnTime <= 0 || (_playersContainer.TryGet(CurrentTeam, out var currentPlayer) && !currentPlayer.CanAction))
+                MoveNextTeam();
+                TurnNumber++;
+                TurnTime = TurnDuration;
+
+                if (player)
+                    OnNewTurnPreviousClientRpc(new ClientRpcParams().For(player.ClientId));
+
+                if (_playersContainer.TryGet(CurrentTeam, out var nextPlayer))
                 {
-                    MoveNextTeam();
-                    TurnNumber++;
-                    UnSelectSelectedClientRpc();
-                    TurnTime = TurnDuration;
+                    nextPlayer.AttackCount = 1;
+                    nextPlayer.MoveCount = 1;
                 }
             }
         }
 
         [ClientRpc]
-        public void UnSelectSelectedClientRpc()
+        public void OnNewTurnPreviousClientRpc(ClientRpcParams _)
         {
-            if(_unitsSelector.HasSelected)
+            if (_unitsSelector.HasSelected)
                 _unitsSelector.UnSelect(_unitsSelector.Selected);
         }
 

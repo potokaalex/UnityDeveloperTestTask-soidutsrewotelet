@@ -28,8 +28,8 @@ namespace Game.Code.Gameplay.Player
                 if (_unitsSelector.HasSelected && _unitsSelector.Selected.IsDestinationSet)
                     _unitsSelector.Selected.ClearDestination();
 
-                if (TryGetHit(out var hit) && hit.transform.TryGetComponent<UnitController>(out var interactive))
-                    interactive.Interact();
+                if (TryGetHit(out var hit) && hit.transform.TryGetComponent<UnitController>(out var unit))
+                    unit.Interact();
             }
             else if (Input.GetMouseButtonDown(1))
             {

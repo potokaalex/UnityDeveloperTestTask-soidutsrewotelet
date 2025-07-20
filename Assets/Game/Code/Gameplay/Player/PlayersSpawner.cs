@@ -28,7 +28,7 @@ namespace Game.Code.Gameplay.Player
             if (_networkController.IsServer)
             {
                 var instance = _instantiator.InstantiatePrefabForComponent<PlayerController>(PlayerPrefab.gameObject);
-                instance.Initialize(_lastId++, GetTeam());
+                instance.Initialize(clientId, GetTeam());
                 instance.NetworkObject.SpawnWithOwnership(clientId);
             }
         }

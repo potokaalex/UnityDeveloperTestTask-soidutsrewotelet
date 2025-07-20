@@ -31,11 +31,17 @@ namespace Game.Code.Gameplay.Player
             outList.AddRange(_players);
         }
 
-        public bool TryGet(TeamType team, out PlayerController outPlayer)
+        public bool TryGet(TeamType team, out PlayerController player)
+        {
+            player = Get(team);
+            return player;
+        }
+        
+        public bool TryGet(ulong clientId, out PlayerController outPlayer)
         {
             foreach (var player in _players)
             {
-                if (player.Team == team)
+                if (player.ClientId == clientId)
                 {
                     outPlayer = player;
                     return true;
@@ -44,6 +50,14 @@ namespace Game.Code.Gameplay.Player
 
             outPlayer = null;
             return false;
+        }
+
+        public PlayerController Get(TeamType team)
+        {
+            foreach (var player in _players)
+                if (player.Team == team)
+                    return player;
+            return null;
         }
     }
 }
