@@ -3589,7 +3589,7 @@ GameObject:
   - component: {fileID: 942851204}
   - component: {fileID: 942851205}
   m_Layer: 0
-  m_Name: Obstacles
+  m_Name: ObstaclesSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5462,6 +5462,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ObstaclesSpawner: {fileID: 942851205}
+  UnitsSpawner: {fileID: 437743527}
 --- !u!114 &1526921189
 MonoBehaviour:
   m_ObjectHideFlags: 0

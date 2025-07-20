@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Game.Code.Core;
+using Game.Code.Core.Network;
 using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit.View;
 using Unity.Netcode;
@@ -44,6 +45,13 @@ namespace Game.Code.Gameplay.Unit
             _playerProvider = playerController;
             _selector = selector;
             _container = container;
+        }
+
+        public void Initialize(Vector3 position, int id, TeamType team)
+        {
+            transform.position = position;
+            Id.Initialize(this, id);
+            Team.Initialize(this, team);
         }
 
         public override void OnNetworkSpawn()
@@ -126,7 +134,7 @@ namespace Game.Code.Gameplay.Unit
             if (Vector3.Distance(transform.position, point) <= Speed)
             {
                 var path = new NavMeshPath();
-                if (NavMesh.CalculatePath(transform.position, point, NavMesh.AllAreas, path)) 
+                if (NavMesh.CalculatePath(transform.position, point, NavMesh.AllAreas, path))
                     PathPoints = path.corners;
             }
 

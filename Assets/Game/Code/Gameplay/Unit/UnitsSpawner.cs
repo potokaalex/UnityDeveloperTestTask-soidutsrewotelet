@@ -1,36 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Unity.Netcode;
+using Game.Code.Core;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Code.Gameplay.Unit
 {
-    public class UnitsSpawner : NetworkBehaviour
+    public class UnitsSpawner : MonoBehaviour
     {
         public UnitsSpawnerPreset[] Presets;
         public List<UnitController> Prefabs;
-        private int _unitId;
+        private Instantiator _instantiator;
+        private int _lastId;
 
-        public override void OnNetworkSpawn()
+        [Inject]
+        public void Construct(Instantiator instantiator) => _instantiator = instantiator;
+
+        public void Spawn()
         {
-            /*
-            if (IsServer)
-            {
-                foreach (var preset in Presets)
-                foreach (var spawnPoint in preset.SpawnPoints)
-                    CreateUnit(preset, spawnPoint);
-            }
-            */
+            foreach (var preset in Presets)
+            foreach (var spawnPoint in preset.SpawnPoints)
+                CreateUnit(preset, spawnPoint);
         }
-
+        
         private void CreateUnit(UnitsSpawnerPreset preset, UnitSpawnPoint spawnPoint)
         {
-            var prefab = Prefabs.First(x => x.Type == preset.Type);
-            var instance = Instantiate(prefab);
-            instance.transform.position = spawnPoint.transform.position;
-            instance.Team.Initialize(instance);
-            instance.Team.Value = spawnPoint.Team;
-            instance.Id.Initialize(instance);
-            instance.Id.Value = _unitId++;
+            var prefab = Prefabs.First(x => x.Type == preset.Type).gameObject;
+            var instance = _instantiator.InstantiatePrefabForComponent<UnitController>(prefab);
+            instance.Initialize(spawnPoint.transform.position, _lastId++, spawnPoint.Team);
             instance.NetworkObject.Spawn();
         }
     }

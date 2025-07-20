@@ -1,6 +1,7 @@
 ﻿using Game.Code.Core.Network;
 using Game.Code.Core.Network.LifeTime;
 using Game.Code.Gameplay.Obstacle;
+using Game.Code.Gameplay.Unit;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace Game.Code.Gameplay
     public class GroundController : NetworkBehaviour, IOnClientConnectedReceiver
     {
         public ObstaclesSpawner ObstaclesSpawner;
+        public UnitsSpawner UnitsSpawner;
         private int _seed;
 
         public override void OnNetworkSpawn()
@@ -17,6 +19,7 @@ namespace Game.Code.Gameplay
             {
                 _seed = Random.Range(int.MinValue, int.MaxValue);
                 CreateGround(_seed);
+                UnitsSpawner.Spawn();
             }
         }
 

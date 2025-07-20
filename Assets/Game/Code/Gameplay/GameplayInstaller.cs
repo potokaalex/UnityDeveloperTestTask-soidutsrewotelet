@@ -44,7 +44,7 @@ namespace Game.Code.Gameplay
         private void BindNetwork()
         {
             Container.BindInterfacesTo<NetworkController>().AsSingle();
-            Container.BindInterfacesTo<NetworkPrefabsController>().AsSingle();
+            Container.BindInterfacesTo<NetworkPrefabsController>().AsSingle().NonLazy();
             Container.BindInterfacesTo<NetworkLifetimeController>().AsSingle();
         }
 

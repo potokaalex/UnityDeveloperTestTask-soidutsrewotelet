@@ -1,20 +1,16 @@
 ﻿using System;
 using Unity.Netcode;
-using Zenject;
 
 namespace Game.Code.Core.Network
 {
-    public class NetworkPrefabsController : IInitializable, IDisposable
+    public class NetworkPrefabsController : IDisposable
     {
-        private readonly Instantiator _instantiator;
-
-        public NetworkPrefabsController(Instantiator instantiator) => _instantiator = instantiator;
-
-        public void Initialize()
+        public NetworkPrefabsController(Instantiator instantiator)
         {
+            //Register here, because spawn events can arrive before zen.Initialize
             foreach (var prefab in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
                 NetworkManager.Singleton.PrefabHandler.AddHandler(prefab.Prefab,
-                    new CustomNetworkPrefabInstanceHandler(prefab.Prefab, _instantiator));
+                    new CustomNetworkPrefabInstanceHandler(prefab.Prefab, instantiator));
         }
 
         public void Dispose()
