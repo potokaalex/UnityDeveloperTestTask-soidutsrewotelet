@@ -35,16 +35,16 @@ namespace Game.Code.Gameplay
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisConnected;
         }
 
-        public void OnClientConnected(ulong clientId)
+        private void OnClientConnected(ulong clientId)
         {
             CreateGroundClientRpc(_seed, new ClientRpcParams().For(clientId));
             PlayersSpawner.Spawn(clientId);
         }
 
-        public void OnClientDisConnected(ulong clientId) => PlayersSpawner.Despawn(clientId, OwnerClientId);
+        private void OnClientDisConnected(ulong clientId) => PlayersSpawner.Despawn(clientId, OwnerClientId);
 
         [ClientRpc]
-        public void CreateGroundClientRpc(int seed, ClientRpcParams _) => CreateGround(seed);
+        private void CreateGroundClientRpc(int seed, ClientRpcParams _) => CreateGround(seed);
 
         private void CreateGround(int seed) => ObstaclesSpawner.Spawn(seed);
     }

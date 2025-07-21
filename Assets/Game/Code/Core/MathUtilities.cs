@@ -2,7 +2,7 @@
 
 namespace Game.Code.Core
 {
-    public static class MathExtensions
+    public static class MathUtilities
     {
         public static bool IsCirclesIntersect(Vector3 centerA, float radiusA, Vector3 centerB, float radiusB)
         {

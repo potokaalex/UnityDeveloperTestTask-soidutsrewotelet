@@ -51,8 +51,18 @@ namespace Game.Code.Gameplay.Unit
                 AttackServerRpc(unit.Id);
         }
 
+        public void CalculateAttack(Vector3 point)
+        {
+            if (_selector.Selected == _unit && _playerProvider.Player.AttackCount > 0)
+            {
+                using var d = GetUnitsForAttack(point, _playerProvider.Player.Team, out var forAttack);
+                using var d1 = GetAllEnemies(out var enemies);
+                View.ViewAttack(point, FullAttackRadius, forAttack, enemies);
+            }
+        }
+
         [ServerRpc]
-        public void AttackServerRpc(ulong unitId, ServerRpcParams rpcParams = default)
+        private void AttackServerRpc(ulong unitId, ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;
 
@@ -70,16 +80,6 @@ namespace Game.Code.Gameplay.Unit
 
         [ClientRpc]
         private void AttackClientRpc(ClientRpcParams _) => _selector.UnSelect(_unit);
-
-        public void CalculateAttack(Vector3 point)
-        {
-            if (_selector.Selected == _unit && _playerProvider.Player.AttackCount > 0)
-            {
-                using var d = GetUnitsForAttack(point, _playerProvider.Player.Team, out var forAttack);
-                using var d1 = GetAllEnemies(out var enemies);
-                View.ViewAttack(point, FullAttackRadius, forAttack, enemies);
-            }
-        }
 
         private PooledObject<List<UnitController>> GetUnitsForAttack(Vector3 point, TeamType playerTeam, out List<UnitController> outList)
         {

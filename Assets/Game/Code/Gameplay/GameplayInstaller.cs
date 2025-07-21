@@ -1,4 +1,6 @@
-﻿using Game.Code.Gameplay.Player;
+﻿using Game.Code.Core;
+using Game.Code.Core.Network;
+using Game.Code.Gameplay.Player;
 using Game.Code.Gameplay.Unit;
 using Game.Code.Gameplay.Unit.View;
 using Unity.Netcode;
@@ -19,6 +21,8 @@ namespace Game.Code.Gameplay
 
         public override void InstallBindings()
         {
+            Container.Bind<Instantiator>().AsSingle().CopyIntoAllSubContainers();
+            Container.BindInterfacesTo<NetworkPrefabsController>().AsSingle();
             Container.Bind<MapController>().FromInstance(MapController).AsSingle();
             Container.Bind<CameraController>().FromInstance(CameraController).AsSingle();
             BindPlayer();

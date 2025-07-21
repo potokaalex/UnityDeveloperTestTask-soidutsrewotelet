@@ -31,7 +31,7 @@ namespace Game.Code.Gameplay
 
         public NetworkVariable<TeamType> WinnerNV { get; } = new();
 
-        public TeamType Winner { get => WinnerNV.Value; set => WinnerNV.Value = value; }
+        public TeamType Winner { get => WinnerNV.Value; private set => WinnerNV.Value = value; }
 
         [Inject]
         public void Construct(PlayersContainer playersContainer, IPlayerProvider playerProvider, UnitsSelector unitsSelector,
@@ -72,16 +72,8 @@ namespace Game.Code.Gameplay
                 {
                     nextPlayer.AttackCount = 1;
                     nextPlayer.MoveCount = 1;
-                    //options
                 }
             }
-        }
-
-        [ClientRpc]
-        public void OnNewTurnPreviousClientRpc(ClientRpcParams _)
-        {
-            if (_unitsSelector.HasSelected)
-                _unitsSelector.UnSelect(_unitsSelector.Selected);
         }
 
         public bool IsHisTurn(PlayerController player)
@@ -93,8 +85,15 @@ namespace Game.Code.Gameplay
 
         public void FinishTurn() => FinishTurnServerRpc();
 
+        [ClientRpc]
+        private void OnNewTurnPreviousClientRpc(ClientRpcParams _)
+        {
+            if (_unitsSelector.HasSelected)
+                _unitsSelector.UnSelect(_unitsSelector.Selected);
+        }
+
         [ServerRpc(RequireOwnership = false)]
-        public void FinishTurnServerRpc(ServerRpcParams rpcParams = default)
+        private void FinishTurnServerRpc(ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;
             if (_playersContainer.TryGet(sender, out var player) && IsHisTurn(player))

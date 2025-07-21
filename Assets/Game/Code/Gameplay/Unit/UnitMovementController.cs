@@ -87,15 +87,6 @@ namespace Game.Code.Gameplay.Unit
             SetDestinationClientRpc(Model.PathPoints, new ClientRpcParams().For(sender));
         }
 
-        [ClientRpc]
-        public void SetDestinationClientRpc(Vector3[] pathPoints, ClientRpcParams _)
-        {
-            Model.PathPoints = pathPoints;
-            if (_selector.Selected == _unit)
-                View.OnDestinationChanged(Helper.IsDestinationValid, Model.PathPoints);
-            Attack.CalculateAttack(Helper.IsDestinationValid ? Model.PathPoints[^1] : transform.position);
-        }
-
         [ServerRpc]
         public void MoveDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
@@ -111,14 +102,23 @@ namespace Game.Code.Gameplay.Unit
             }
         }
 
-        [ClientRpc]
-        public void OnMoveDestinationClientRpc(ClientRpcParams _) => _selector.UnSelect(_unit);
-
         [ServerRpc]
         public void ClearDestinationServerRpc(ServerRpcParams rpcParams = default)
         {
             Model.PathPoints = Array.Empty<Vector3>();
             SetDestinationClientRpc(Model.PathPoints, new ClientRpcParams().For(rpcParams.Receive.SenderClientId));
         }
+
+        [ClientRpc]
+        private void SetDestinationClientRpc(Vector3[] pathPoints, ClientRpcParams _)
+        {
+            Model.PathPoints = pathPoints;
+            if (_selector.Selected == _unit)
+                View.OnDestinationChanged(Helper.IsDestinationValid, Model.PathPoints);
+            Attack.CalculateAttack(Helper.IsDestinationValid ? Model.PathPoints[^1] : transform.position);
+        }
+
+        [ClientRpc]
+        private void OnMoveDestinationClientRpc(ClientRpcParams _) => _selector.UnSelect(_unit);
     }
 }

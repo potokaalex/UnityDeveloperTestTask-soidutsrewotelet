@@ -32,7 +32,13 @@ namespace Game.Code.Gameplay.Unit
         }
 
         [ServerRpc]
-        public void SelectServerRpc(ServerRpcParams rpcParams = default)
+        public void OnSelectServerRpc() => Model.NavMeshObstacle.enabled = false;
+
+        [ServerRpc]
+        public void OnUnSelectServerRpc() => Model.NavMeshObstacle.enabled = true;
+
+        [ServerRpc]
+        private void SelectServerRpc(ServerRpcParams rpcParams = default)
         {
             var sender = rpcParams.Receive.SenderClientId;
             if (_playersContainer.TryGet(sender, out var player))
@@ -41,12 +47,6 @@ namespace Game.Code.Gameplay.Unit
         }
 
         [ClientRpc]
-        public void SelectClientRpc(ClientRpcParams _) => _unitsSelector.Select(_unit);
-
-        [ServerRpc]
-        public void OnSelectServerRpc() => Model.NavMeshObstacle.enabled = false;
-
-        [ServerRpc]
-        public void OnUnSelectServerRpc() => Model.NavMeshObstacle.enabled = true;
+        private void SelectClientRpc(ClientRpcParams _) => _unitsSelector.Select(_unit);
     }
 }

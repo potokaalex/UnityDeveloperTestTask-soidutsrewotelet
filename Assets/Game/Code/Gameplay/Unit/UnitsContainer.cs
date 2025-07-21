@@ -17,14 +17,6 @@ namespace Game.Code.Gameplay.Unit
                 outList.Add(unit);
         }
 
-        public void Get(TeamType team, List<UnitController> outList)
-        {
-            outList.Clear();
-            foreach (var unit in _units)
-                if (unit.Team == team)
-                    outList.Add(unit);
-        }
-
         public UnitController Get(ulong id)
         {
             foreach (var unit in _units)
